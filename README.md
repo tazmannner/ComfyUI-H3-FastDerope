@@ -59,8 +59,10 @@ matlowai. This pack makes it cheaper and gates it; you need MAINodes installed.
    pastes pass 1's own pixels back there (`restore_static`): the background keeps its full detail and stops
    shimmering. Fine-edge detail in redrawn static-camera shots went from 87% to 94% of pass 1's; moving-camera shots
    are unaffected.
-7. **Color Anchor.** During pass 2's high-noise steps the coarse colour layout of pass 1 is kept and only finer
-   detail is redrawn, so costume colours can't drift (it cut colour drift ~20% on the sword fight, no time cost).
+7. **Color Anchor (optional, off in the examples).** During pass 2's high-noise steps the coarse colour layout of
+   pass 1 is kept and only finer detail is redrawn. It cut colour drift ~20% on the sword fight at no time cost, but on
+   a huge, very fast motion (a fist filling the frame) it pulled the neighbouring pose back in as a faint see-through
+   double, so it is not on by default.
 
 Pass 1 is your normal render and its soundtrack is the final audio.
 

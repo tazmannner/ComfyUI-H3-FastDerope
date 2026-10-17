@@ -1,6 +1,6 @@
 {
- "last_node_id": 39,
- "last_link_id": 60,
+ "last_node_id": 38,
+ "last_link_id": 58,
  "nodes": [
   {
    "id": 1,
@@ -726,8 +726,7 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      19,
-      60
+      19
      ]
     }
    ],
@@ -968,8 +967,8 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      30,
-      59
+      28,
+      30
      ]
     }
    ],
@@ -990,15 +989,15 @@
    "id": 23,
    "type": "BasicGuider",
    "pos": [
-    3840,
-    60
+    3420,
+    544
    ],
    "size": [
     380,
     132
    ],
    "flags": {},
-   "order": 9,
+   "order": 8,
    "mode": 0,
    "inputs": [
     {
@@ -1102,7 +1101,7 @@
    "id": 26,
    "type": "SamplerCustomAdvanced",
    "pos": [
-    4260,
+    3840,
     60
    ],
    "size": [
@@ -1110,7 +1109,7 @@
     210
    ],
    "flags": {},
-   "order": 10,
+   "order": 9,
    "mode": 0,
    "inputs": [
     {
@@ -1163,7 +1162,7 @@
    "id": 27,
    "type": "VAEDecode",
    "pos": [
-    4680,
+    4260,
     60
    ],
    "size": [
@@ -1171,7 +1170,7 @@
     132
    ],
    "flags": {},
-   "order": 11,
+   "order": 10,
    "mode": 0,
    "inputs": [
     {
@@ -1203,7 +1202,7 @@
    "id": 28,
    "type": "H3ExactRecover",
    "pos": [
-    5100,
+    4680,
     60
    ],
    "size": [
@@ -1211,7 +1210,7 @@
     158
    ],
    "flags": {},
-   "order": 12,
+   "order": 11,
    "mode": 0,
    "inputs": [
     {
@@ -1291,7 +1290,7 @@
    "id": 30,
    "type": "AnimeCadence",
    "pos": [
-    5940,
+    5520,
     60
    ],
    "size": [
@@ -1299,7 +1298,7 @@
     262
    ],
    "flags": {},
-   "order": 14,
+   "order": 13,
    "mode": 0,
    "inputs": [
     {
@@ -1344,7 +1343,7 @@
    "id": 31,
    "type": "VHS_VideoCombine",
    "pos": [
-    5940,
+    5520,
     362
    ],
    "size": [
@@ -1352,7 +1351,7 @@
     392
    ],
    "flags": {},
-   "order": 14,
+   "order": 13,
    "mode": 0,
    "inputs": [
     {
@@ -1408,7 +1407,7 @@
    "id": 32,
    "type": "VHS_VideoCombine",
    "pos": [
-    6360,
+    5940,
     60
    ],
    "size": [
@@ -1416,7 +1415,7 @@
     392
    ],
    "flags": {},
-   "order": 15,
+   "order": 14,
    "mode": 0,
    "inputs": [
     {
@@ -1633,7 +1632,7 @@
    "id": 36,
    "type": "FastDeropeSegmentSplice",
    "pos": [
-    5520,
+    5100,
     60
    ],
    "size": [
@@ -1641,7 +1640,7 @@
     236
    ],
    "flags": {},
-   "order": 13,
+   "order": 12,
    "mode": 0,
    "inputs": [
     {
@@ -1729,51 +1728,6 @@
   },
   {
    "id": 38,
-   "type": "FastDeropeColorAnchor",
-   "pos": [
-    3420,
-    544
-   ],
-   "size": [
-    380,
-    210
-   ],
-   "flags": {},
-   "order": 8,
-   "mode": 0,
-   "inputs": [
-    {
-     "name": "model",
-     "type": "MODEL",
-     "link": 59
-    },
-    {
-     "name": "init",
-     "type": "LATENT",
-     "link": 60
-    }
-   ],
-   "outputs": [
-    {
-     "name": "MODEL",
-     "type": "MODEL",
-     "links": [
-      28
-     ]
-    }
-   ],
-   "properties": {
-    "Node name for S&R": "FastDeropeColorAnchor"
-   },
-   "widgets_values": [
-    0.7,
-    4,
-    0.8
-   ],
-   "title": "COLOR ANCHOR: keep pass-1 colours in the redraw"
-  },
-  {
-   "id": 39,
    "type": "Note",
    "pos": [
     60,
@@ -1790,7 +1744,7 @@
    "outputs": [],
    "properties": {},
    "widgets_values": [
-    "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice puts the burst back into the full-quality pass 1.\n5. NO GHOSTING: Freeze Mask locks the outer handle frames to pass 1 inside pass 2 (V2V Init, time_varying on), so the splice crossfade never blends two different takes; a handle containing a shot cut is switched exactly on the cut. It also locks the STATIC background (regions that don't move in pass 1): Segment Splice pastes pass 1's own pixels back there (restore_static), keeping full detail and stopping background shimmer.\n6. COLOR ANCHOR keeps pass 1's coarse colours in pass 2's high-noise steps, so costumes can't change colour.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory.\n\nOPTIONAL: the last node is Anime Cadence from tazmannner/ComfyUI-H3-AnimeCadence (holds the result on 2s/3s); delete it if you don't use that pack."
+    "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice puts the burst back into the full-quality pass 1.\n5. NO GHOSTING: Freeze Mask locks the outer handle frames to pass 1 inside pass 2 (V2V Init, time_varying on), so the splice crossfade never blends two different takes; a handle containing a shot cut is switched exactly on the cut. It also locks the STATIC background (regions that don't move in pass 1): Segment Splice pastes pass 1's own pixels back there (restore_static), keeping full detail and stopping background shimmer.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory.\n\nOPTIONAL: the last node is Anime Cadence from tazmannner/ComfyUI-H3-AnimeCadence (holds the result on 2s/3s); delete it if you don't use that pack."
    ]
   }
  ],
@@ -2013,7 +1967,7 @@
   ],
   [
    28,
-   38,
+   22,
    0,
    23,
    0,
@@ -2258,22 +2212,6 @@
    37,
    2,
    "IMAGE"
-  ],
-  [
-   59,
-   22,
-   0,
-   38,
-   0,
-   "MODEL"
-  ],
-  [
-   60,
-   17,
-   0,
-   38,
-   1,
-   "LATENT"
   ]
  ],
  "groups": [],

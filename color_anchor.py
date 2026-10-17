@@ -40,9 +40,9 @@ class FastDeropeColorAnchor:
     RETURN_TYPES = ("MODEL",)
     FUNCTION = "patch"
     CATEGORY = "FastDerope"
-    DESCRIPTION = ("Pass-2 patch: keeps pass 1's coarse colours (latent low frequencies of the slowed clip) during the "
+    DESCRIPTION = ("EXPERIMENTAL. Pass-2 patch: keeps pass 1's coarse colours (latent low frequencies of the slowed clip) during the "
                    "high-noise steps, so the redraw can't change a costume's colour; edges and shapes stay free, so "
-                   "the smear is still redrawn crisp.")
+                   "the smear is still redrawn crisp. Can leave a faint see-through double on huge, very fast motion.")
 
     def patch(self, model, init, strength, cell, sigma_low):
         ref = init["samples"]
