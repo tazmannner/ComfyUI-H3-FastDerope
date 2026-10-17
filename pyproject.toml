@@ -1,0 +1,17 @@
+[project]
+name = "comfyui-h3-fastderope"
+description = "A cheaper, motion-gated de-rope for MiniMax H3 fast-motion smear: temporal window attention for the slowed-down pass, an absolute motion gate that redraws only extreme bursts, and a taeh3 loader. Builds on ComfyUI-MAINodes."
+version = "0.1.0"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.optional-dependencies]
+gate = ["opencv-python-headless"]
+
+[project.urls]
+Repository = "https://github.com/tazmannner/ComfyUI-H3-FastDerope"
+
+[tool.comfy]
+PublisherId = "tazmannner"
+DisplayName = "H3 Fast De-rope"
+Icon = ""

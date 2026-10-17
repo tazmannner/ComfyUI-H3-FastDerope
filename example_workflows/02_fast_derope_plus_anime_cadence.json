@@ -1,0 +1,2135 @@
+{
+ "last_node_id": 37,
+ "last_link_id": 54,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "UNETLoader",
+   "pos": [
+    60,
+    60
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1,
+      24
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "CLIPLoader",
+   "pos": [
+    60,
+    232
+   ],
+   "size": [
+    380,
+    158
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      2,
+      20
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+    "minimax",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "VAELoader",
+   "pos": [
+    60,
+    430
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      3,
+      21
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "minimax_h3_video_vae_fp16.safetensors"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    60,
+    576
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      36,
+      47
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "minimax_h3_video_vae_int8_convrot.safetensors"
+   ],
+   "title": "int8 video VAE for the final decode"
+  },
+  {
+   "id": 5,
+   "type": "VAELoader",
+   "pos": [
+    60,
+    722
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      40
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "minimax_h3_audio_vae_fp32.safetensors"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "FastDeropeTAELoader",
+   "pos": [
+    60,
+    868
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      14,
+      18
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeTAELoader"
+   },
+   "widgets_values": [
+    "taeh3.safetensors"
+   ],
+   "title": "taeh3 for the throwaway decode/encode"
+  },
+  {
+   "id": 7,
+   "type": "MiniMaxH3SigmaShift",
+   "pos": [
+    480,
+    60
+   ],
+   "size": [
+    380,
+    158
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4,
+      6
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "MiniMaxH3SigmaShift"
+   },
+   "widgets_values": [
+    12.0,
+    3.0
+   ]
+  },
+  {
+   "id": 8,
+   "type": "MiniMaxH3ImageToVideo",
+   "pos": [
+    480,
+    258
+   ],
+   "size": [
+    380,
+    288
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 3
+    },
+    {
+     "name": "first_frame",
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "last_frame",
+     "type": "IMAGE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ]
+    },
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      11
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "MiniMaxH3ImageToVideo"
+   },
+   "widgets_values": [
+    "integrated_multimodal_description: [Shot 1] anime style, a medium shot frames a woman walking forward through a chaotic, neon-drenched street market at night. Thick steam rolls off cramped food stalls on both sides, catching the harsh glare of overhead magenta and cyan lights. The woman has bright green Hime-cut hair, styled with sharp face-framing sidelocks and blunt bangs. She wears a white low-cut top beneath a structured crop-top mini jacket and a short pleated skirt, and she tightly grips a sleek, bright pink pistol, her knuckles turning white. The camera pulls out at fast speed, tracking backward ahead of her while shaking slightly in a jittery handheld motion. As the woman pushes forward, her green hair whips violently around her cheeks and her boots splash heavily through rain-slicked puddles. Her eyes are wide and darting, and she casts a rapid glance over her shoulder, then turns forward again and ducks beneath a glowing holographic advertisement as the camera keeps retreating in front of her. A deep, rhythmic thrum of industrial bass music echoes through the alleyway from the surrounding market.\n\noverall_soundscape: Her boots splash sharply through rain-slicked puddles with every step, mixing with her ragged breathing. Steam hisses from the crowded food stalls under the low background clamor of the night market.\n\nnon_diegetic_music: N/A",
+    1024,
+    576,
+    107
+   ]
+  },
+  {
+   "id": 9,
+   "type": "BasicGuider",
+   "pos": [
+    900,
+    60
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    },
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "GUIDER",
+     "type": "GUIDER",
+     "links": [
+      8
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "BasicGuider"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 10,
+   "type": "RandomNoise",
+   "pos": [
+    60,
+    1014
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "NOISE",
+     "type": "NOISE",
+     "links": [
+      7
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RandomNoise"
+   },
+   "widgets_values": [
+    101,
+    "fixed"
+   ]
+  },
+  {
+   "id": 11,
+   "type": "KSamplerSelect",
+   "pos": [
+    60,
+    1186
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "SAMPLER",
+     "type": "SAMPLER",
+     "links": [
+      9,
+      32
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerSelect"
+   },
+   "widgets_values": [
+    "euler"
+   ]
+  },
+  {
+   "id": 12,
+   "type": "BasicScheduler",
+   "pos": [
+    900,
+    232
+   ],
+   "size": [
+    380,
+    184
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "SIGMAS",
+     "type": "SIGMAS",
+     "links": [
+      10
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "BasicScheduler"
+   },
+   "widgets_values": [
+    "beta57",
+    20,
+    1.0
+   ]
+  },
+  {
+   "id": 13,
+   "type": "SamplerCustomAdvanced",
+   "pos": [
+    1320,
+    60
+   ],
+   "size": [
+    380,
+    210
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "noise",
+     "type": "NOISE",
+     "link": 7
+    },
+    {
+     "name": "guider",
+     "type": "GUIDER",
+     "link": 8
+    },
+    {
+     "name": "sampler",
+     "type": "SAMPLER",
+     "link": 9
+    },
+    {
+     "name": "sigmas",
+     "type": "SIGMAS",
+     "link": 10
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "output",
+     "type": "LATENT",
+     "links": [
+      12,
+      13,
+      39,
+      46
+     ]
+    },
+    {
+     "name": "denoised_output",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SamplerCustomAdvanced"
+   },
+   "widgets_values": [],
+   "title": "PASS 1: your normal render (choreography + audio)"
+  },
+  {
+   "id": 14,
+   "type": "H3JerkOracle",
+   "pos": [
+    1740,
+    60
+   ],
+   "size": [
+    380,
+    470
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 12
+    }
+   ],
+   "outputs": [
+    {
+     "name": "hold_map",
+     "type": "STRING",
+     "links": [
+      49
+     ]
+    },
+    {
+     "name": "segments",
+     "type": "STRING",
+     "links": []
+    },
+    {
+     "name": "window_start",
+     "type": "INT",
+     "links": []
+    },
+    {
+     "name": "window_len",
+     "type": "INT",
+     "links": []
+    },
+    {
+     "name": "profile",
+     "type": "STRING",
+     "links": []
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3JerkOracle"
+   },
+   "widgets_values": [
+    107,
+    0.75,
+    4,
+    true,
+    "balanced (default)",
+    8,
+    "value |d3| (default)",
+    0.0,
+    24,
+    0.0,
+    18,
+    6.7,
+    "minimax-h3",
+    0
+   ],
+   "title": "MAINodes: where is motion too fast"
+  },
+  {
+   "id": 15,
+   "type": "VAEDecode",
+   "pos": [
+    1740,
+    570
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 13
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 14
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      48
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 16,
+   "type": "H3TimeSmear",
+   "pos": [
+    2580,
+    60
+   ],
+   "size": [
+    380,
+    314
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 15
+    },
+    {
+     "name": "hold_map",
+     "type": "STRING",
+     "link": 16,
+     "widget": {
+      "name": "hold_map"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [
+      17
+     ]
+    },
+    {
+     "name": "hold_map_used",
+     "type": "STRING",
+     "links": [
+      38
+     ]
+    },
+    {
+     "name": "length",
+     "type": "INT",
+     "links": [
+      22
+     ]
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3TimeSmear"
+   },
+   "widgets_values": [
+    4,
+    "",
+    false,
+    24,
+    0.0,
+    18,
+    6.7
+   ],
+   "title": "MAINodes: slow the fast spans"
+  },
+  {
+   "id": 17,
+   "type": "VAEEncode",
+   "pos": [
+    3000,
+    60
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 17
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 18
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      19
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 18,
+   "type": "H3V2VInit",
+   "pos": [
+    3420,
+    60
+   ],
+   "size": [
+    380,
+    444
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 19
+    },
+    {
+     "name": "oracle_samples",
+     "type": "LATENT",
+     "link": null
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": null
+    },
+    {
+     "name": "audio_latent",
+     "type": "LATENT",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      34
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3V2VInit"
+   },
+   "widgets_values": [
+    0,
+    0.0,
+    2,
+    0,
+    false,
+    false,
+    "custom (use audio_strength)",
+    1.0,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 19,
+   "type": "MiniMaxH3ImageToVideo",
+   "pos": [
+    3000,
+    232
+   ],
+   "size": [
+    380,
+    314
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 20
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 21
+    },
+    {
+     "name": "length",
+     "type": "INT",
+     "link": 22,
+     "widget": {
+      "name": "length"
+     }
+    },
+    {
+     "name": "first_frame",
+     "type": "IMAGE",
+     "link": 23
+    },
+    {
+     "name": "last_frame",
+     "type": "IMAGE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      28
+     ]
+    },
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "MiniMaxH3ImageToVideo"
+   },
+   "widgets_values": [
+    "integrated_multimodal_description: [Shot 1] anime style, a medium shot frames a woman walking forward through a chaotic, neon-drenched street market at night. Thick steam rolls off cramped food stalls on both sides, catching the harsh glare of overhead magenta and cyan lights. The woman has bright green Hime-cut hair, styled with sharp face-framing sidelocks and blunt bangs. She wears a white low-cut top beneath a structured crop-top mini jacket and a short pleated skirt, and she tightly grips a sleek, bright pink pistol, her knuckles turning white. The camera pulls out at fast speed, tracking backward ahead of her while shaking slightly in a jittery handheld motion. As the woman pushes forward, her green hair whips violently around her cheeks and her boots splash heavily through rain-slicked puddles. Her eyes are wide and darting, and she casts a rapid glance over her shoulder, then turns forward again and ducks beneath a glowing holographic advertisement as the camera keeps retreating in front of her. A deep, rhythmic thrum of industrial bass music echoes through the alleyway from the surrounding market.\n\noverall_soundscape: Her boots splash sharply through rain-slicked puddles with every step, mixing with her ragged breathing. Steam hisses from the crowded food stalls under the low background clamor of the night market.\n\nnon_diegetic_music: N/A",
+    1024,
+    576,
+    124
+   ]
+  },
+  {
+   "id": 20,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    480,
+    586
+   ],
+   "size": [
+    380,
+    158
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 24
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      25
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16.safetensors",
+    0.8
+   ],
+   "title": "turbo LoRA for pass 2"
+  },
+  {
+   "id": 21,
+   "type": "MiniMaxH3SigmaShift",
+   "pos": [
+    900,
+    456
+   ],
+   "size": [
+    380,
+    158
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 25
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "MiniMaxH3SigmaShift"
+   },
+   "widgets_values": [
+    12.0,
+    2.0
+   ]
+  },
+  {
+   "id": 22,
+   "type": "FastDeropeWindowAttention",
+   "pos": [
+    1320,
+    310
+   ],
+   "size": [
+    380,
+    262
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 26
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      27,
+      29
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeWindowAttention"
+   },
+   "widgets_values": [
+    4,
+    4,
+    8,
+    24,
+    0.0,
+    1.0
+   ],
+   "title": "H3 WINDOW ATTENTION (makes pass 2 cheap)"
+  },
+  {
+   "id": 23,
+   "type": "BasicGuider",
+   "pos": [
+    3420,
+    544
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 27
+    },
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 28
+    }
+   ],
+   "outputs": [
+    {
+     "name": "GUIDER",
+     "type": "GUIDER",
+     "links": [
+      31
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "BasicGuider"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 24,
+   "type": "H3InjectSchedule",
+   "pos": [
+    1740,
+    742
+   ],
+   "size": [
+    380,
+    210
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 29
+    }
+   ],
+   "outputs": [
+    {
+     "name": "SIGMAS",
+     "type": "SIGMAS",
+     "links": [
+      33
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3InjectSchedule"
+   },
+   "widgets_values": [
+    "simple",
+    8,
+    0.5,
+    "custom"
+   ]
+  },
+  {
+   "id": 25,
+   "type": "RandomNoise",
+   "pos": [
+    60,
+    1332
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "NOISE",
+     "type": "NOISE",
+     "links": [
+      30
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RandomNoise"
+   },
+   "widgets_values": [
+    108,
+    "fixed"
+   ]
+  },
+  {
+   "id": 26,
+   "type": "SamplerCustomAdvanced",
+   "pos": [
+    3840,
+    60
+   ],
+   "size": [
+    380,
+    210
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "noise",
+     "type": "NOISE",
+     "link": 30
+    },
+    {
+     "name": "guider",
+     "type": "GUIDER",
+     "link": 31
+    },
+    {
+     "name": "sampler",
+     "type": "SAMPLER",
+     "link": 32
+    },
+    {
+     "name": "sigmas",
+     "type": "SIGMAS",
+     "link": 33
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 34
+    }
+   ],
+   "outputs": [
+    {
+     "name": "output",
+     "type": "LATENT",
+     "links": [
+      35
+     ]
+    },
+    {
+     "name": "denoised_output",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SamplerCustomAdvanced"
+   },
+   "widgets_values": [],
+   "title": "PASS 2: redraw the slowed clip (inject 0.5)"
+  },
+  {
+   "id": 27,
+   "type": "VAEDecode",
+   "pos": [
+    4260,
+    60
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 35
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 36
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      37
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 28,
+   "type": "H3ExactRecover",
+   "pos": [
+    4680,
+    60
+   ],
+   "size": [
+    380,
+    158
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 37
+    },
+    {
+     "name": "hold_map",
+     "type": "STRING",
+     "link": 38,
+     "widget": {
+      "name": "hold_map"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      54
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3ExactRecover"
+   },
+   "widgets_values": [
+    ""
+   ],
+   "title": "MAINodes: back to real time"
+  },
+  {
+   "id": 29,
+   "type": "VAEDecodeAudio",
+   "pos": [
+    1740,
+    992
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 39
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 40
+    }
+   ],
+   "outputs": [
+    {
+     "name": "AUDIO",
+     "type": "AUDIO",
+     "links": [
+      43,
+      45
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecodeAudio"
+   },
+   "widgets_values": [],
+   "title": "audio: pass 1's normal soundtrack"
+  },
+  {
+   "id": 30,
+   "type": "AnimeCadence",
+   "pos": [
+    5520,
+    60
+   ],
+   "size": [
+    380,
+    262
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 41
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [
+      44
+     ]
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    },
+    {
+     "name": "drawing_starts",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "AnimeCadence"
+   },
+   "widgets_values": [
+    "auto",
+    "sharpest",
+    2,
+    4,
+    1.0,
+    0
+   ],
+   "title": "ANIME CADENCE (auto 2s/3s)"
+  },
+  {
+   "id": 31,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    5520,
+    362
+   ],
+   "size": [
+    380,
+    392
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 42
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 43
+    },
+    {
+     "name": "meta_batch",
+     "type": "VHS_BatchManager",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "widgets_values": {
+    "frame_rate": 24,
+    "loop_count": 0,
+    "filename_prefix": "FastDerope/fast_derope_cadence_derope_only",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 12,
+    "save_metadata": false,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   }
+  },
+  {
+   "id": 32,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    5940,
+    60
+   ],
+   "size": [
+    380,
+    392
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 44
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 45
+    },
+    {
+     "name": "meta_batch",
+     "type": "VHS_BatchManager",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "widgets_values": {
+    "frame_rate": 24,
+    "loop_count": 0,
+    "filename_prefix": "FastDerope/fast_derope_cadence",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 12,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   }
+  },
+  {
+   "id": 33,
+   "type": "VAEDecode",
+   "pos": [
+    1740,
+    1164
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 46
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 47
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      50,
+      52
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 34,
+   "type": "FastDeropeMotionGate",
+   "pos": [
+    2160,
+    60
+   ],
+   "size": [
+    380,
+    262
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 48
+    },
+    {
+     "name": "oracle_hold_map",
+     "type": "STRING",
+     "link": 49
+    }
+   ],
+   "outputs": [
+    {
+     "name": "segment_images",
+     "type": "IMAGE",
+     "links": [
+      15
+     ]
+    },
+    {
+     "name": "hold_map",
+     "type": "STRING",
+     "links": [
+      16
+     ]
+    },
+    {
+     "name": "splice_map",
+     "type": "STRING",
+     "links": [
+      53
+     ]
+    },
+    {
+     "name": "segment_start",
+     "type": "INT",
+     "links": [
+      51
+     ]
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeMotionGate"
+   },
+   "widgets_values": [
+    0.09,
+    5,
+    4,
+    4,
+    12
+   ]
+  },
+  {
+   "id": 35,
+   "type": "ImageFromBatch",
+   "pos": [
+    2580,
+    414
+   ],
+   "size": [
+    380,
+    184
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 50
+    },
+    {
+     "name": "batch_index",
+     "type": "INT",
+     "link": 51,
+     "widget": {
+      "name": "batch_index"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      23
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageFromBatch"
+   },
+   "widgets_values": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": 36,
+   "type": "FastDeropeSegmentSplice",
+   "pos": [
+    5100,
+    60
+   ],
+   "size": [
+    380,
+    184
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "baseline",
+     "type": "IMAGE",
+     "link": 52
+    },
+    {
+     "name": "splice_map",
+     "type": "STRING",
+     "link": 53
+    },
+    {
+     "name": "segment",
+     "type": "IMAGE",
+     "link": 54
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      41,
+      42
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeSegmentSplice"
+   },
+   "widgets_values": [
+    6
+   ]
+  },
+  {
+   "id": 37,
+   "type": "Note",
+   "pos": [
+    60,
+    -420
+   ],
+   "size": [
+    500,
+    380
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice crossfades the burst back into the full-quality pass 1.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory.\n\nOPTIONAL: the last node is Anime Cadence from tazmannner/ComfyUI-H3-AnimeCadence (holds the result on 2s/3s); delete it if you don't use that pack."
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   7,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   2,
+   0,
+   8,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   3,
+   0,
+   8,
+   1,
+   "VAE"
+  ],
+  [
+   4,
+   7,
+   0,
+   9,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   8,
+   0,
+   9,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   7,
+   0,
+   12,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   10,
+   0,
+   13,
+   0,
+   "NOISE"
+  ],
+  [
+   8,
+   9,
+   0,
+   13,
+   1,
+   "GUIDER"
+  ],
+  [
+   9,
+   11,
+   0,
+   13,
+   2,
+   "SAMPLER"
+  ],
+  [
+   10,
+   12,
+   0,
+   13,
+   3,
+   "SIGMAS"
+  ],
+  [
+   11,
+   8,
+   1,
+   13,
+   4,
+   "LATENT"
+  ],
+  [
+   12,
+   13,
+   0,
+   14,
+   0,
+   "LATENT"
+  ],
+  [
+   13,
+   13,
+   0,
+   15,
+   0,
+   "LATENT"
+  ],
+  [
+   14,
+   6,
+   0,
+   15,
+   1,
+   "VAE"
+  ],
+  [
+   15,
+   34,
+   0,
+   16,
+   0,
+   "IMAGE"
+  ],
+  [
+   16,
+   34,
+   1,
+   16,
+   1,
+   "STRING"
+  ],
+  [
+   17,
+   16,
+   0,
+   17,
+   0,
+   "IMAGE"
+  ],
+  [
+   18,
+   6,
+   0,
+   17,
+   1,
+   "VAE"
+  ],
+  [
+   19,
+   17,
+   0,
+   18,
+   0,
+   "LATENT"
+  ],
+  [
+   20,
+   2,
+   0,
+   19,
+   0,
+   "CLIP"
+  ],
+  [
+   21,
+   3,
+   0,
+   19,
+   1,
+   "VAE"
+  ],
+  [
+   22,
+   16,
+   2,
+   19,
+   2,
+   "INT"
+  ],
+  [
+   23,
+   35,
+   0,
+   19,
+   3,
+   "IMAGE"
+  ],
+  [
+   24,
+   1,
+   0,
+   20,
+   0,
+   "MODEL"
+  ],
+  [
+   25,
+   20,
+   0,
+   21,
+   0,
+   "MODEL"
+  ],
+  [
+   26,
+   21,
+   0,
+   22,
+   0,
+   "MODEL"
+  ],
+  [
+   27,
+   22,
+   0,
+   23,
+   0,
+   "MODEL"
+  ],
+  [
+   28,
+   19,
+   0,
+   23,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   29,
+   22,
+   0,
+   24,
+   0,
+   "MODEL"
+  ],
+  [
+   30,
+   25,
+   0,
+   26,
+   0,
+   "NOISE"
+  ],
+  [
+   31,
+   23,
+   0,
+   26,
+   1,
+   "GUIDER"
+  ],
+  [
+   32,
+   11,
+   0,
+   26,
+   2,
+   "SAMPLER"
+  ],
+  [
+   33,
+   24,
+   0,
+   26,
+   3,
+   "SIGMAS"
+  ],
+  [
+   34,
+   18,
+   0,
+   26,
+   4,
+   "LATENT"
+  ],
+  [
+   35,
+   26,
+   0,
+   27,
+   0,
+   "LATENT"
+  ],
+  [
+   36,
+   4,
+   0,
+   27,
+   1,
+   "VAE"
+  ],
+  [
+   37,
+   27,
+   0,
+   28,
+   0,
+   "IMAGE"
+  ],
+  [
+   38,
+   16,
+   1,
+   28,
+   1,
+   "STRING"
+  ],
+  [
+   39,
+   13,
+   0,
+   29,
+   0,
+   "LATENT"
+  ],
+  [
+   40,
+   5,
+   0,
+   29,
+   1,
+   "VAE"
+  ],
+  [
+   41,
+   36,
+   0,
+   30,
+   0,
+   "IMAGE"
+  ],
+  [
+   42,
+   36,
+   0,
+   31,
+   0,
+   "IMAGE"
+  ],
+  [
+   43,
+   29,
+   0,
+   31,
+   1,
+   "AUDIO"
+  ],
+  [
+   44,
+   30,
+   0,
+   32,
+   0,
+   "IMAGE"
+  ],
+  [
+   45,
+   29,
+   0,
+   32,
+   1,
+   "AUDIO"
+  ],
+  [
+   46,
+   13,
+   0,
+   33,
+   0,
+   "LATENT"
+  ],
+  [
+   47,
+   4,
+   0,
+   33,
+   1,
+   "VAE"
+  ],
+  [
+   48,
+   15,
+   0,
+   34,
+   0,
+   "IMAGE"
+  ],
+  [
+   49,
+   14,
+   0,
+   34,
+   1,
+   "STRING"
+  ],
+  [
+   50,
+   33,
+   0,
+   35,
+   0,
+   "IMAGE"
+  ],
+  [
+   51,
+   34,
+   3,
+   35,
+   1,
+   "INT"
+  ],
+  [
+   52,
+   33,
+   0,
+   36,
+   0,
+   "IMAGE"
+  ],
+  [
+   53,
+   34,
+   2,
+   36,
+   1,
+   "STRING"
+  ],
+  [
+   54,
+   28,
+   0,
+   36,
+   2,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}
