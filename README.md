@@ -51,6 +51,17 @@ matlowai. This pack makes it cheaper and gates it; you need MAINodes installed.
    *Drawing Recover* holds each redrawn drawing over its slot, so the burst comes back crisp and already on 2s. Pass 2
    was 8-26% cheaper than the per-frame version above, with the same crispness and the impacts on the same frames.
 
+5. **Clean splices (no ghosting).** Where the redrawn burst meets pass 1, a crossfade used to blend two different
+   takes of the same moment into a see-through double image. Now *Freeze Mask* locks the outer handle frames to pass 1
+   inside pass 2 (H3 V2V Init, `time_varying` on), so the crossfade only blends pass 1 with itself; a handle that
+   contains a shot cut is switched exactly on the cut instead.
+6. **Static background lock.** Regions that don't move in pass 1 are frozen in pass 2 as well, and Segment Splice
+   pastes pass 1's own pixels back there (`restore_static`): the background keeps its full detail and stops
+   shimmering. Fine-edge detail in redrawn static-camera shots went from 87% to 94% of pass 1's; moving-camera shots
+   are unaffected.
+7. **Color Anchor.** During pass 2's high-noise steps the coarse colour layout of pass 1 is kept and only finer
+   detail is redrawn, so costume colours can't drift (it cut colour drift ~20% on the sword fight, no time cost).
+
 Pass 1 is your normal render and its soundtrack is the final audio.
 
 ## Results (RTX 5090)
@@ -102,6 +113,8 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 | **Segment Splice (skip pass 2 if calm)** | pastes the recovered burst into the full-quality pass 1; lazy input, so pass 2 only runs when the gate found something |
 | **Drawing Smear (de-rope only the drawings)** | replaces H3 Time Smear: Motion Gate segment + hold_map → one token-aligned static token per 2s drawing in the hot span (`every`, `key_poses`, `key_tokens`), `drawing_map` |
 | **Drawing Recover (hold drawings on 2s/3s)** | replaces H3 Exact Recover: holds each redrawn drawing (sharpest frame of its token) over its slot |
+| **Freeze Mask (lock splice handles to pass 1)** | per-frame regenerate/freeze MASK for H3 V2V Init (`time_varying` on): locks the gate's outer handle frames and, with `segment_images`, the static background |
+| **Color Anchor (keep pass-1 colours in pass 2)** | MODEL patch for pass 2: keeps the init latent's coarse colours while sigma >= `sigma_low` (`strength` 0.7, `cell` 4) |
 | **Load TAE as VAE (taeh3)** | loads a video TAE from `models/vae_approx` as a normal VAE for VAEEncode / VAEDecode |
 
 ## Example workflows
@@ -137,6 +150,10 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 - DMAD turbo for pass 2 looked better than a 12-step base-model pass 2 (which was grainier and +60% time). DMAD
   likes `shift_audio` 2.
 - Shots with no fast action (dialogue, slow camera moves) gain nothing from a de-rope; the gate skips them for you.
+- **taeh3:** use the encoder+decoder file (~23 MB). The ~10 MB `taeh3.safetensors` that ComfyUI uses for live previews
+  has no encoder; the loader now says so instead of failing with "VAE is invalid".
+- **Faster pass 1 (optional, not in the examples):** 14 steps instead of 20 gave nearly the same take, 26% faster.
+  DMAD 0.8 on pass 1 at 8 steps (simple schedule, audio shift 2) halves pass 1 but gives a different, calmer take.
 
 ## Limitations
 

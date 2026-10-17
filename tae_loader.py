@@ -32,6 +32,10 @@ class FastDeropeTAELoader:
     def load(self, tae_name):
         if tae_name not in self._cache:
             sd = comfy.utils.load_torch_file(folder_paths.get_full_path_or_raise("vae_approx", tae_name))
+            if not any(k.startswith("encoder.") for k in sd):
+                raise RuntimeError(
+                    f"{tae_name} has no encoder: it is the decoder-only preview TAE (~10 MB). The de-rope needs the "
+                    "encoder+decoder taeh3 (~23 MB) from madebyollin/taehv; pick that file here.")
             vae = comfy.sd.VAE(sd=sd)
             vae.throw_exception_if_invalid()
             type(self)._cache = {tae_name: vae}

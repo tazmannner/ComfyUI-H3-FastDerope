@@ -2,8 +2,9 @@
 
 Builds on matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover).
 Drawing Smear / Recover: optional Drawing De-rope (redraw only the 2s drawings of a burst)."""
+from .color_anchor import FastDeropeColorAnchor
 from .drawing import FastDeropeDrawingRecover, FastDeropeDrawingSmear
-from .motion_gate import FastDeropeMotionGate, FastDeropeSegmentSplice
+from .motion_gate import FastDeropeFreezeMask, FastDeropeMotionGate, FastDeropeSegmentSplice
 from .tae_loader import FastDeropeTAELoader
 from .window_attention import FastDeropeWindowAttention
 
@@ -14,6 +15,8 @@ NODE_CLASS_MAPPINGS = {
     "FastDeropeTAELoader": FastDeropeTAELoader,
     "FastDeropeDrawingSmear": FastDeropeDrawingSmear,
     "FastDeropeDrawingRecover": FastDeropeDrawingRecover,
+    "FastDeropeFreezeMask": FastDeropeFreezeMask,
+    "FastDeropeColorAnchor": FastDeropeColorAnchor,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "FastDeropeWindowAttention": "H3 Window Attention (fast de-rope pass)",
@@ -22,6 +25,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FastDeropeTAELoader": "Load TAE as VAE (taeh3)",
     "FastDeropeDrawingSmear": "Drawing Smear (de-rope only the drawings)",
     "FastDeropeDrawingRecover": "Drawing Recover (hold drawings on 2s/3s)",
+    "FastDeropeFreezeMask": "Freeze Mask (lock splice handles to pass 1)",
+    "FastDeropeColorAnchor": "Color Anchor (keep pass-1 colours in pass 2)",
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

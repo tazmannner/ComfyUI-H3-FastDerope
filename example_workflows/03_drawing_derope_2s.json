@@ -1,6 +1,6 @@
 {
- "last_node_id": 36,
- "last_link_id": 51,
+ "last_node_id": 38,
+ "last_link_id": 57,
  "nodes": [
   {
    "id": 1,
@@ -23,7 +23,7 @@
      "type": "MODEL",
      "links": [
       1,
-      22
+      23
      ]
     }
    ],
@@ -56,7 +56,7 @@
      "type": "CLIP",
      "links": [
       2,
-      18
+      19
      ]
     }
    ],
@@ -90,7 +90,7 @@
      "type": "VAE",
      "links": [
       3,
-      19
+      20
      ]
     }
    ],
@@ -121,8 +121,8 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      34,
-      42
+      35,
+      43
      ]
     }
    ],
@@ -154,7 +154,7 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      38
+      39
      ]
     }
    ],
@@ -392,7 +392,7 @@
      "type": "SAMPLER",
      "links": [
       9,
-      30
+      31
      ]
     }
    ],
@@ -490,8 +490,8 @@
      "links": [
       12,
       13,
-      37,
-      41
+      38,
+      42
      ]
     },
     {
@@ -532,7 +532,7 @@
      "name": "hold_map",
      "type": "STRING",
      "links": [
-      44
+      45
      ]
     },
     {
@@ -613,7 +613,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      43
+      44
      ]
     }
    ],
@@ -653,7 +653,8 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      17
+      17,
+      57
      ]
     }
    ],
@@ -690,7 +691,7 @@
     {
      "name": "mask",
      "type": "MASK",
-     "link": null
+     "link": 18
     },
     {
      "name": "audio_latent",
@@ -703,7 +704,7 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      32
+      33
      ]
     }
    ],
@@ -716,7 +717,7 @@
     2,
     0,
     false,
-    false,
+    true,
     "custom (use audio_strength)",
     1.0,
     0,
@@ -741,17 +742,17 @@
     {
      "name": "clip",
      "type": "CLIP",
-     "link": 18
+     "link": 19
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 19
+     "link": 20
     },
     {
      "name": "length",
      "type": "INT",
-     "link": 20,
+     "link": 21,
      "widget": {
       "name": "length"
      }
@@ -759,7 +760,7 @@
     {
      "name": "first_frame",
      "type": "IMAGE",
-     "link": 21
+     "link": 22
     },
     {
      "name": "last_frame",
@@ -772,7 +773,7 @@
      "name": "positive",
      "type": "CONDITIONING",
      "links": [
-      26
+      27
      ]
     },
     {
@@ -809,7 +810,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 22
+     "link": 23
     }
    ],
    "outputs": [
@@ -817,7 +818,7 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      23
+      24
      ]
     }
    ],
@@ -848,7 +849,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 23
+     "link": 24
     }
    ],
    "outputs": [
@@ -856,7 +857,7 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      24
+      25
      ]
     }
    ],
@@ -886,7 +887,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 24
+     "link": 25
     }
    ],
    "outputs": [
@@ -894,8 +895,8 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      25,
-      27
+      28,
+      56
      ]
     }
    ],
@@ -916,26 +917,26 @@
    "id": 22,
    "type": "BasicGuider",
    "pos": [
-    3420,
-    544
+    3840,
+    60
    ],
    "size": [
     380,
     132
    ],
    "flags": {},
-   "order": 8,
+   "order": 9,
    "mode": 0,
    "inputs": [
     {
      "name": "model",
      "type": "MODEL",
-     "link": 25
+     "link": 26
     },
     {
      "name": "conditioning",
      "type": "CONDITIONING",
-     "link": 26
+     "link": 27
     }
    ],
    "outputs": [
@@ -943,7 +944,7 @@
      "name": "GUIDER",
      "type": "GUIDER",
      "links": [
-      29
+      30
      ]
     }
    ],
@@ -970,7 +971,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 27
+     "link": 28
     }
    ],
    "outputs": [
@@ -978,7 +979,7 @@
      "name": "SIGMAS",
      "type": "SIGMAS",
      "links": [
-      31
+      32
      ]
     }
    ],
@@ -1012,7 +1013,7 @@
      "name": "NOISE",
      "type": "NOISE",
      "links": [
-      28
+      29
      ]
     }
    ],
@@ -1028,7 +1029,7 @@
    "id": 25,
    "type": "SamplerCustomAdvanced",
    "pos": [
-    3840,
+    4260,
     60
    ],
    "size": [
@@ -1036,33 +1037,33 @@
     210
    ],
    "flags": {},
-   "order": 9,
+   "order": 10,
    "mode": 0,
    "inputs": [
     {
      "name": "noise",
      "type": "NOISE",
-     "link": 28
+     "link": 29
     },
     {
      "name": "guider",
      "type": "GUIDER",
-     "link": 29
+     "link": 30
     },
     {
      "name": "sampler",
      "type": "SAMPLER",
-     "link": 30
+     "link": 31
     },
     {
      "name": "sigmas",
      "type": "SIGMAS",
-     "link": 31
+     "link": 32
     },
     {
      "name": "latent_image",
      "type": "LATENT",
-     "link": 32
+     "link": 33
     }
    ],
    "outputs": [
@@ -1070,7 +1071,7 @@
      "name": "output",
      "type": "LATENT",
      "links": [
-      33
+      34
      ]
     },
     {
@@ -1089,46 +1090,6 @@
    "id": 26,
    "type": "VAEDecode",
    "pos": [
-    4260,
-    60
-   ],
-   "size": [
-    380,
-    132
-   ],
-   "flags": {},
-   "order": 10,
-   "mode": 0,
-   "inputs": [
-    {
-     "name": "samples",
-     "type": "LATENT",
-     "link": 33
-    },
-    {
-     "name": "vae",
-     "type": "VAE",
-     "link": 34
-    }
-   ],
-   "outputs": [
-    {
-     "name": "IMAGE",
-     "type": "IMAGE",
-     "links": [
-      35
-     ]
-    }
-   ],
-   "properties": {
-    "Node name for S&R": "VAEDecode"
-   },
-   "widgets_values": []
-  },
-  {
-   "id": 27,
-   "type": "FastDeropeDrawingRecover",
-   "pos": [
     4680,
     60
    ],
@@ -1141,14 +1102,14 @@
    "mode": 0,
    "inputs": [
     {
-     "name": "images",
-     "type": "IMAGE",
-     "link": 35
+     "name": "samples",
+     "type": "LATENT",
+     "link": 34
     },
     {
-     "name": "drawing_map",
-     "type": "STRING",
-     "link": 36
+     "name": "vae",
+     "type": "VAE",
+     "link": 35
     }
    ],
    "outputs": [
@@ -1156,7 +1117,47 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      49
+      36
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 27,
+   "type": "FastDeropeDrawingRecover",
+   "pos": [
+    5100,
+    60
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 36
+    },
+    {
+     "name": "drawing_map",
+     "type": "STRING",
+     "link": 37
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      50
      ]
     }
    ],
@@ -1184,12 +1185,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 37
+     "link": 38
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 38
+     "link": 39
     }
    ],
    "outputs": [
@@ -1197,7 +1198,7 @@
      "name": "AUDIO",
      "type": "AUDIO",
      "links": [
-      40
+      41
      ]
     }
    ],
@@ -1211,7 +1212,7 @@
    "id": 29,
    "type": "VHS_VideoCombine",
    "pos": [
-    5520,
+    5940,
     60
    ],
    "size": [
@@ -1219,18 +1220,18 @@
     392
    ],
    "flags": {},
-   "order": 13,
+   "order": 14,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 39
+     "link": 40
     },
     {
      "name": "audio",
      "type": "AUDIO",
-     "link": 40
+     "link": 41
     },
     {
      "name": "meta_batch",
@@ -1289,12 +1290,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 41
+     "link": 42
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 42
+     "link": 43
     }
    ],
    "outputs": [
@@ -1302,8 +1303,8 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      45,
-      47
+      46,
+      48
      ]
     }
    ],
@@ -1321,7 +1322,7 @@
    ],
    "size": [
     380,
-    262
+    288
    ],
    "flags": {},
    "order": 5,
@@ -1330,12 +1331,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 43
+     "link": 44
     },
     {
      "name": "oracle_hold_map",
      "type": "STRING",
-     "link": 44
+     "link": 45
     }
    ],
    "outputs": [
@@ -1343,28 +1344,29 @@
      "name": "segment_images",
      "type": "IMAGE",
      "links": [
-      50
+      51,
+      55
      ]
     },
     {
      "name": "hold_map",
      "type": "STRING",
      "links": [
-      51
+      52
      ]
     },
     {
      "name": "splice_map",
      "type": "STRING",
      "links": [
-      48
+      49
      ]
     },
     {
      "name": "segment_start",
      "type": "INT",
      "links": [
-      46
+      47
      ]
     },
     {
@@ -1381,7 +1383,8 @@
     5,
     4,
     4,
-    12
+    12,
+    8
    ]
   },
   {
@@ -1402,12 +1405,12 @@
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 45
+     "link": 46
     },
     {
      "name": "batch_index",
      "type": "INT",
-     "link": 46,
+     "link": 47,
      "widget": {
       "name": "batch_index"
      }
@@ -1418,7 +1421,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      21
+      22
      ]
     }
    ],
@@ -1434,31 +1437,31 @@
    "id": 33,
    "type": "FastDeropeSegmentSplice",
    "pos": [
-    5100,
+    5520,
     60
    ],
    "size": [
     380,
-    184
+    236
    ],
    "flags": {},
-   "order": 12,
+   "order": 13,
    "mode": 0,
    "inputs": [
     {
      "name": "baseline",
      "type": "IMAGE",
-     "link": 47
+     "link": 48
     },
     {
      "name": "splice_map",
      "type": "STRING",
-     "link": 48
+     "link": 49
     },
     {
      "name": "segment",
      "type": "IMAGE",
-     "link": 49
+     "link": 50
     }
    ],
    "outputs": [
@@ -1466,7 +1469,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      39
+      40
      ]
     }
    ],
@@ -1474,7 +1477,9 @@
     "Node name for S&R": "FastDeropeSegmentSplice"
    },
    "widgets_values": [
-    6
+    6,
+    true,
+    0.03
    ]
   },
   {
@@ -1495,12 +1500,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 50
+     "link": 51
     },
     {
      "name": "hold_map",
      "type": "STRING",
-     "link": 51
+     "link": 52
     }
    ],
    "outputs": [
@@ -1508,21 +1513,23 @@
      "name": "images",
      "type": "IMAGE",
      "links": [
-      15
+      15,
+      53
      ]
     },
     {
      "name": "drawing_map",
      "type": "STRING",
      "links": [
-      36
+      37,
+      54
      ]
     },
     {
      "name": "length",
      "type": "INT",
      "links": [
-      20
+      21
      ]
     },
     {
@@ -1543,6 +1550,99 @@
   },
   {
    "id": 35,
+   "type": "FastDeropeFreezeMask",
+   "pos": [
+    3000,
+    586
+   ],
+   "size": [
+    380,
+    184
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 53
+    },
+    {
+     "name": "map",
+     "type": "STRING",
+     "link": 54
+    },
+    {
+     "name": "segment_images",
+     "type": "IMAGE",
+     "link": 55
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      18
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeFreezeMask"
+   },
+   "widgets_values": [
+    0.03
+   ],
+   "title": "FREEZE MASK: lock the splice handles to pass 1 (no ghosting)"
+  },
+  {
+   "id": 36,
+   "type": "FastDeropeColorAnchor",
+   "pos": [
+    3420,
+    544
+   ],
+   "size": [
+    380,
+    210
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 56
+    },
+    {
+     "name": "init",
+     "type": "LATENT",
+     "link": 57
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeColorAnchor"
+   },
+   "widgets_values": [
+    0.7,
+    4,
+    0.8
+   ],
+   "title": "COLOR ANCHOR: keep pass-1 colours in the redraw"
+  },
+  {
+   "id": 37,
    "type": "Note",
    "pos": [
     60,
@@ -1559,11 +1659,11 @@
    "outputs": [],
    "properties": {},
    "widgets_values": [
-    "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice crossfades the burst back into the full-quality pass 1.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory."
+    "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice puts the burst back into the full-quality pass 1.\n5. NO GHOSTING: Freeze Mask locks the outer handle frames to pass 1 inside pass 2 (V2V Init, time_varying on), so the splice crossfade never blends two different takes; a handle containing a shot cut is switched exactly on the cut. It also locks the STATIC background (regions that don't move in pass 1): Segment Splice pastes pass 1's own pixels back there (restore_static), keeping full detail and stopping background shimmer.\n6. COLOR ANCHOR keeps pass 1's coarse colours in pass 2's high-noise steps, so costumes can't change colour.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory."
    ]
   },
   {
-   "id": 36,
+   "id": 38,
    "type": "Note",
    "pos": [
     580,
@@ -1723,6 +1823,14 @@
   ],
   [
    18,
+   35,
+   0,
+   17,
+   2,
+   "MASK"
+  ],
+  [
+   19,
    2,
    0,
    18,
@@ -1730,7 +1838,7 @@
    "CLIP"
   ],
   [
-   19,
+   20,
    3,
    0,
    18,
@@ -1738,7 +1846,7 @@
    "VAE"
   ],
   [
-   20,
+   21,
    34,
    2,
    18,
@@ -1746,7 +1854,7 @@
    "INT"
   ],
   [
-   21,
+   22,
    32,
    0,
    18,
@@ -1754,7 +1862,7 @@
    "IMAGE"
   ],
   [
-   22,
+   23,
    1,
    0,
    19,
@@ -1762,7 +1870,7 @@
    "MODEL"
   ],
   [
-   23,
+   24,
    19,
    0,
    20,
@@ -1770,7 +1878,7 @@
    "MODEL"
   ],
   [
-   24,
+   25,
    20,
    0,
    21,
@@ -1778,15 +1886,15 @@
    "MODEL"
   ],
   [
-   25,
-   21,
+   26,
+   36,
    0,
    22,
    0,
    "MODEL"
   ],
   [
-   26,
+   27,
    18,
    0,
    22,
@@ -1794,7 +1902,7 @@
    "CONDITIONING"
   ],
   [
-   27,
+   28,
    21,
    0,
    23,
@@ -1802,7 +1910,7 @@
    "MODEL"
   ],
   [
-   28,
+   29,
    24,
    0,
    25,
@@ -1810,7 +1918,7 @@
    "NOISE"
   ],
   [
-   29,
+   30,
    22,
    0,
    25,
@@ -1818,7 +1926,7 @@
    "GUIDER"
   ],
   [
-   30,
+   31,
    11,
    0,
    25,
@@ -1826,7 +1934,7 @@
    "SAMPLER"
   ],
   [
-   31,
+   32,
    23,
    0,
    25,
@@ -1834,7 +1942,7 @@
    "SIGMAS"
   ],
   [
-   32,
+   33,
    17,
    0,
    25,
@@ -1842,7 +1950,7 @@
    "LATENT"
   ],
   [
-   33,
+   34,
    25,
    0,
    26,
@@ -1850,7 +1958,7 @@
    "LATENT"
   ],
   [
-   34,
+   35,
    4,
    0,
    26,
@@ -1858,7 +1966,7 @@
    "VAE"
   ],
   [
-   35,
+   36,
    26,
    0,
    27,
@@ -1866,7 +1974,7 @@
    "IMAGE"
   ],
   [
-   36,
+   37,
    34,
    1,
    27,
@@ -1874,7 +1982,7 @@
    "STRING"
   ],
   [
-   37,
+   38,
    13,
    0,
    28,
@@ -1882,7 +1990,7 @@
    "LATENT"
   ],
   [
-   38,
+   39,
    5,
    0,
    28,
@@ -1890,7 +1998,7 @@
    "VAE"
   ],
   [
-   39,
+   40,
    33,
    0,
    29,
@@ -1898,7 +2006,7 @@
    "IMAGE"
   ],
   [
-   40,
+   41,
    28,
    0,
    29,
@@ -1906,7 +2014,7 @@
    "AUDIO"
   ],
   [
-   41,
+   42,
    13,
    0,
    30,
@@ -1914,7 +2022,7 @@
    "LATENT"
   ],
   [
-   42,
+   43,
    4,
    0,
    30,
@@ -1922,7 +2030,7 @@
    "VAE"
   ],
   [
-   43,
+   44,
    15,
    0,
    31,
@@ -1930,7 +2038,7 @@
    "IMAGE"
   ],
   [
-   44,
+   45,
    14,
    0,
    31,
@@ -1938,7 +2046,7 @@
    "STRING"
   ],
   [
-   45,
+   46,
    30,
    0,
    32,
@@ -1946,7 +2054,7 @@
    "IMAGE"
   ],
   [
-   46,
+   47,
    31,
    3,
    32,
@@ -1954,7 +2062,7 @@
    "INT"
   ],
   [
-   47,
+   48,
    30,
    0,
    33,
@@ -1962,7 +2070,7 @@
    "IMAGE"
   ],
   [
-   48,
+   49,
    31,
    2,
    33,
@@ -1970,7 +2078,7 @@
    "STRING"
   ],
   [
-   49,
+   50,
    27,
    0,
    33,
@@ -1978,7 +2086,7 @@
    "IMAGE"
   ],
   [
-   50,
+   51,
    31,
    0,
    34,
@@ -1986,12 +2094,52 @@
    "IMAGE"
   ],
   [
-   51,
+   52,
    31,
    1,
    34,
    1,
    "STRING"
+  ],
+  [
+   53,
+   34,
+   0,
+   35,
+   0,
+   "IMAGE"
+  ],
+  [
+   54,
+   34,
+   1,
+   35,
+   1,
+   "STRING"
+  ],
+  [
+   55,
+   31,
+   0,
+   35,
+   2,
+   "IMAGE"
+  ],
+  [
+   56,
+   21,
+   0,
+   36,
+   0,
+   "MODEL"
+  ],
+  [
+   57,
+   16,
+   0,
+   36,
+   1,
+   "LATENT"
   ]
  ],
  "groups": [],
