@@ -165,7 +165,9 @@ class FastDeropeMotionGate:
                   "handle_in": held[0], "handle_out": len(holds) - 1 - held[-1]}
         rep = (f"MotionGate: hot frames {runs}; regenerate f{a}-f{b} ({b - a + 1} of {n} frames, "
                f"{sum(holds)} slowed frames); cuts at {np.where(cut)[0].tolist()}")
-        return (images[a:b + 1], json.dumps({"holds": holds, "world_len": len(holds)}), json.dumps(splice), a, rep)
+        # "hot" marks the sustained-fast frames themselves (not shoulders/handles): Drawing Smear redraws only those as drawings
+        seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]]}
+        return (images[a:b + 1], json.dumps(seg_map), json.dumps(splice), a, rep)
 
 
 class FastDeropeSegmentSplice:

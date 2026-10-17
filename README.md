@@ -44,6 +44,13 @@ matlowai. This pack makes it cheaper and gates it; you need MAINodes installed.
    taeh3 autoencoder (34 s → 2 s): pass 2 starts from 92% noise, so full VAE precision is wasted there. Use the int8
    H3 video VAE for the final decode (same picture, ~2x faster).
 
+4. **Drawing De-rope (on 2s, optional).** Anime only shows a new drawing every 2 frames during action, so the
+   in-between frames of a burst never need their own token. *Drawing Smear* keeps one frame per 2-frame slot inside
+   the hot span and gives each drawing exactly one static latent token, aligned to H3's token grid. Key poses
+   (impacts, direction reversals) get two tokens, so pass 2 commits to them, and every shot cut starts a new drawing.
+   *Drawing Recover* holds each redrawn drawing over its slot, so the burst comes back crisp and already on 2s. Pass 2
+   was 8-26% cheaper than the per-frame version above, with the same crispness and the impacts on the same frames.
+
 Pass 1 is your normal render and its soundtrack is the final audio.
 
 ## Results (RTX 5090)
@@ -72,6 +79,17 @@ With the Motion Gate (default) the cost follows the content:
 | 15 s fast-cut fight, Edgerunners LoRA, 1344×768 | 1067 s | ~1306 s (1.22x, four bursts redrawn) |
 | 5 s rocket ride, Edgerunners LoRA, 1344×768 (action all the way) | 197 s | ~316 s (1.6x, whole clip redrawn) |
 
+Drawing De-rope on 2s vs the per-frame FastDerope, pass-2 seconds only (same pass 1):
+
+| clip | FastDerope pass 2 | Drawing De-rope 2s pass 2 |
+|---|---|---|
+| Teen Titans LoRA, punch, 1024×576 | 51 s | 47 s |
+| plain H3, sword fight, 1024×576 | 68 s | 59 s |
+| rocket ride, Edgerunners LoRA, 1344×768 | 141 s | 104 s |
+
+On 3s it is cheaper still, but fast fists came out ghosted; fixed-phase 2s (no key poses) is 22-40% cheaper but can
+land an impact a frame or two late.
+
 Graded by eye on the fastest frames: same choreography and the same smear fixes as MAINodes' de-rope on
 Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 
@@ -82,6 +100,8 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 | **H3 Window Attention (fast de-rope pass)** | MODEL patch for pass 2: temporal window attention (`window` latent frames each side, `anchor_stride`, `chunk`); calls under `min_frames` latent frames stay dense |
 | **Motion Gate (de-rope only extreme motion)** | IMAGE (pass 1, a taeh3 decode is enough) + MAINodes oracle `hold_map` → cropped burst frames, segment `hold_map` for H3 Time Smear, `splice_map`, `segment_start`, report |
 | **Segment Splice (skip pass 2 if calm)** | pastes the recovered burst into the full-quality pass 1; lazy input, so pass 2 only runs when the gate found something |
+| **Drawing Smear (de-rope only the drawings)** | replaces H3 Time Smear: Motion Gate segment + hold_map → one token-aligned static token per 2s drawing in the hot span (`every`, `key_poses`, `key_tokens`), `drawing_map` |
+| **Drawing Recover (hold drawings on 2s/3s)** | replaces H3 Exact Recover: holds each redrawn drawing (sharpest frame of its token) over its slot |
 | **Load TAE as VAE (taeh3)** | loads a video TAE from `models/vae_approx` as a normal VAE for VAEEncode / VAEDecode |
 
 ## Example workflows
@@ -90,6 +110,8 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 - [`02_fast_derope_plus_anime_cadence.json`](example_workflows/02_fast_derope_plus_anime_cadence.json): the same,
   finished with *Anime Cadence* from [ComfyUI-H3-AnimeCadence](https://github.com/tazmannner/ComfyUI-H3-AnimeCadence)
   (hold on 2s/3s). Delete that node if you don't use the pack.
+- [`03_drawing_derope_2s.json`](example_workflows/03_drawing_derope_2s.json): the Drawing De-rope: only the 2s drawings
+  of the burst are redrawn; the burst comes back on 2s.
 
 ## Install
 
@@ -120,7 +142,8 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 - The gate misses brief flash-melts that don't come with sustained motion (one Edgerunners i2v head-flash).
 - Multiple bursts far apart are redrawn as one window from the first to the last burst.
-- Fine details (a small emblem) can come back a little softer in redrawn spans; thin repeated patterns (chain-link
+- Redrawn bursts lose some fine detail compared to the plain render (pass 2 redraws from 92% noise with a turbo
+  LoRA); they are crisp, not blurred or melted. Fine details (a small emblem) can come back a little softer; thin repeated patterns (chain-link
   fences) can pick up artifacts in pass 2.
 - Tested on MiniMax H3 at 768×576 to 1344×768, 5–15 s, graded by eye on the fastest frames. Not a benchmark.
 
