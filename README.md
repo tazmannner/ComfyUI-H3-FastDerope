@@ -15,8 +15,8 @@ run from scratch on an RTX 5090).* ([mp4](assets/demo_gate_park_kick.mp4))
 
 *The other extreme: a 5 s sword fight that is action from start to finish, so the gate can't skip anything (plain
 H3, no LoRA, 1024×576). Top left: plain render, the sword hand and the warrior smear. Top right: MAINodes de-rope.
-Bottom: this pack, per-frame (workflow 01) and on 2s (workflow 03). Same fix: **+66 s and +59 s instead of +114 s**
-(82 s plain, 196 s MAINodes, 148 s and 141 s; RTX 5090).* ([mp4](assets/demo_sword_fight.mp4))
+Bottom: this pack, per-frame (workflow 01) and on 2s (workflow 03). Same fix: **+64 s and +55 s instead of +114 s**
+(82 s plain, 196 s MAINodes, 146 s and 137 s; RTX 5090).* ([mp4](assets/demo_sword_fight.mp4))
 
 The de-rope itself (slow the fast spans down, redraw them, drop the extra frames) is **MAINodes' work** by
 matlowai. This pack makes it cheaper, gates it and cleans up the splices; you need MAINodes installed.
