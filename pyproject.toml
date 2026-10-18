@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-h3-fastderope"
 description = "A cheaper, motion-gated de-rope for MiniMax H3 fast-motion smear: temporal window attention for the slowed-down pass, an absolute motion gate that redraws only extreme bursts, and a taeh3 loader. Builds on ComfyUI-MAINodes."
-version = "0.3.1"
+version = "0.3.2"
 license = { file = "LICENSE" }
 dependencies = []
 

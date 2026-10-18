@@ -175,7 +175,7 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 |---|---|
 | [matlowai/ComfyUI-MAINodes](https://github.com/matlowai/ComfyUI-MAINodes) | Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover |
 | [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite) | video save in the examples |
-| `taeh3.safetensors` in `models/vae_approx` | from [madebyollin/taehv](https://github.com/madebyollin/taehv): the **encoder+decoder** version (~23 MB), not the ~10 MB preview decoder ComfyUI uses for live previews |
+| `taeh3_full.safetensors` in `models/vae_approx` | [download taeh3.safetensors](https://github.com/madebyollin/taehv/raw/main/safetensors/taeh3.safetensors) from [madebyollin/taehv](https://github.com/madebyollin/taehv) (the **encoder+decoder**, 22.7 MB) and save it as `taeh3_full.safetensors`, so it doesn't overwrite the ~10 MB `taeh3.safetensors` preview decoder ComfyUI uses for live previews |
 | an H3 turbo LoRA for pass 2 | the examples use `minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16` at 0.8 |
 | OpenCV (Motion Gate) | most ComfyUI installs have it; else `pip install opencv-python-headless` |
 | MiniMax H3 models | see [Comfy-Org/MiniMax-H3](https://huggingface.co/Comfy-Org/MiniMax-H3); the int8 video VAE is optional (use fp16) |
@@ -210,6 +210,7 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
+- **v0.3.2**: easier examples: one prompt / width / height / length box drives both passes, a setup note with download links, taeh3 saved as `taeh3_full.safetensors` (no clash with the preview decoder).
 - **v0.3.1**: no more thin streak / "wire" lines in the redrawn part (worst on live action). Pass 2's first-frame pin was encoded with the full VAE while the rest of pass 2's input is taeh3; the model got two different latents for the same frame and resolved the conflict with streaks. The pin now uses taeh3 too (same cost). If you built your own copy of the workflows, wire pass 2's MiniMax H3 Image to Video `vae` input to the taeh3 loader.
 - **v0.3.0**: no more ghosting at splice edges (Freeze Mask + cut-aware Motion Gate); calm shots between bursts stay
   pass 1 (no more faces and backgrounds changing frame to frame there); per-shot static background lock with pass-1

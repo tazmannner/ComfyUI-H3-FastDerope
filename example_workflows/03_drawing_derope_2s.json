@@ -1,6 +1,6 @@
 {
- "last_node_id": 37,
- "last_link_id": 55,
+ "last_node_id": 42,
+ "last_link_id": 63,
  "nodes": [
   {
    "id": 1,
@@ -23,7 +23,7 @@
      "type": "MODEL",
      "links": [
       1,
-      23
+      31
      ]
     }
    ],
@@ -56,7 +56,7 @@
      "type": "CLIP",
      "links": [
       2,
-      19
+      24
      ]
     }
    ],
@@ -120,8 +120,8 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      35,
-      43
+      43,
+      51
      ]
     }
    ],
@@ -153,7 +153,7 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      39
+      47
      ]
     }
    ],
@@ -184,9 +184,9 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      14,
-      16,
-      20
+      19,
+      21,
+      25
      ]
     }
    ],
@@ -194,7 +194,7 @@
     "Node name for S&R": "FastDeropeTAELoader"
    },
    "widgets_values": [
-    "taeh3.safetensors"
+    "taeh3_full.safetensors"
    ],
    "title": "taeh3 for the throwaway decode/encode"
   },
@@ -224,8 +224,8 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      4,
-      6
+      8,
+      10
      ]
     }
    ],
@@ -246,7 +246,7 @@
    ],
    "size": [
     380,
-    288
+    392
    ],
    "flags": {},
    "order": 1,
@@ -261,6 +261,38 @@
      "name": "vae",
      "type": "VAE",
      "link": 3
+    },
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "link": 4,
+     "widget": {
+      "name": "prompt"
+     }
+    },
+    {
+     "name": "width",
+     "type": "INT",
+     "link": 5,
+     "widget": {
+      "name": "width"
+     }
+    },
+    {
+     "name": "height",
+     "type": "INT",
+     "link": 6,
+     "widget": {
+      "name": "height"
+     }
+    },
+    {
+     "name": "length",
+     "type": "INT",
+     "link": 7,
+     "widget": {
+      "name": "length"
+     }
     },
     {
      "name": "first_frame",
@@ -278,14 +310,14 @@
      "name": "positive",
      "type": "CONDITIONING",
      "links": [
-      5
+      9
      ]
     },
     {
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      11
+      15
      ]
     }
    ],
@@ -293,10 +325,10 @@
     "Node name for S&R": "MiniMaxH3ImageToVideo"
    },
    "widgets_values": [
-    "integrated_multimodal_description: [Shot 1] anime style, a medium shot frames a woman walking forward through a chaotic, neon-drenched street market at night. Thick steam rolls off cramped food stalls on both sides, catching the harsh glare of overhead magenta and cyan lights. The woman has bright green Hime-cut hair, styled with sharp face-framing sidelocks and blunt bangs. She wears a white low-cut top beneath a structured crop-top mini jacket and a short pleated skirt, and she tightly grips a sleek, bright pink pistol, her knuckles turning white. The camera pulls out at fast speed, tracking backward ahead of her while shaking slightly in a jittery handheld motion. As the woman pushes forward, her green hair whips violently around her cheeks and her boots splash heavily through rain-slicked puddles. Her eyes are wide and darting, and she casts a rapid glance over her shoulder, then turns forward again and ducks beneath a glowing holographic advertisement as the camera keeps retreating in front of her. A deep, rhythmic thrum of industrial bass music echoes through the alleyway from the surrounding market.\n\noverall_soundscape: Her boots splash sharply through rain-slicked puddles with every step, mixing with her ragged breathing. Steam hisses from the crowded food stalls under the low background clamor of the night market.\n\nnon_diegetic_music: N/A",
-    1024,
-    576,
-    107
+    "",
+    1344,
+    768,
+    124
    ]
   },
   {
@@ -317,12 +349,12 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 4
+     "link": 8
     },
     {
      "name": "conditioning",
      "type": "CONDITIONING",
-     "link": 5
+     "link": 9
     }
    ],
    "outputs": [
@@ -330,7 +362,7 @@
      "name": "GUIDER",
      "type": "GUIDER",
      "links": [
-      8
+      12
      ]
     }
    ],
@@ -359,7 +391,7 @@
      "name": "NOISE",
      "type": "NOISE",
      "links": [
-      7
+      11
      ]
     }
    ],
@@ -391,8 +423,8 @@
      "name": "SAMPLER",
      "type": "SAMPLER",
      "links": [
-      9,
-      31
+      13,
+      39
      ]
     }
    ],
@@ -421,7 +453,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 6
+     "link": 10
     }
    ],
    "outputs": [
@@ -429,7 +461,7 @@
      "name": "SIGMAS",
      "type": "SIGMAS",
      "links": [
-      10
+      14
      ]
     }
    ],
@@ -460,27 +492,27 @@
     {
      "name": "noise",
      "type": "NOISE",
-     "link": 7
+     "link": 11
     },
     {
      "name": "guider",
      "type": "GUIDER",
-     "link": 8
+     "link": 12
     },
     {
      "name": "sampler",
      "type": "SAMPLER",
-     "link": 9
+     "link": 13
     },
     {
      "name": "sigmas",
      "type": "SIGMAS",
-     "link": 10
+     "link": 14
     },
     {
      "name": "latent_image",
      "type": "LATENT",
-     "link": 11
+     "link": 15
     }
    ],
    "outputs": [
@@ -488,10 +520,10 @@
      "name": "output",
      "type": "LATENT",
      "links": [
-      12,
-      13,
-      38,
-      42
+      16,
+      18,
+      46,
+      50
      ]
     },
     {
@@ -515,7 +547,7 @@
    ],
    "size": [
     380,
-    470
+    496
    ],
    "flags": {},
    "order": 4,
@@ -524,7 +556,15 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 12
+     "link": 16
+    },
+    {
+     "name": "length",
+     "type": "INT",
+     "link": 17,
+     "widget": {
+      "name": "length"
+     }
     }
    ],
    "outputs": [
@@ -532,7 +572,7 @@
      "name": "hold_map",
      "type": "STRING",
      "links": [
-      45
+      53
      ]
     },
     {
@@ -565,7 +605,7 @@
     "Node name for S&R": "H3JerkOracle"
    },
    "widgets_values": [
-    107,
+    124,
     0.75,
     4,
     true,
@@ -587,7 +627,7 @@
    "type": "VAEDecode",
    "pos": [
     1740,
-    570
+    596
    ],
    "size": [
     380,
@@ -600,12 +640,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 13
+     "link": 18
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 14
+     "link": 19
     }
    ],
    "outputs": [
@@ -613,7 +653,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      44
+      52
      ]
     }
    ],
@@ -640,12 +680,12 @@
     {
      "name": "pixels",
      "type": "IMAGE",
-     "link": 15
+     "link": 20
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 16
+     "link": 21
     }
    ],
    "outputs": [
@@ -653,7 +693,7 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      17
+      22
      ]
     }
    ],
@@ -680,7 +720,7 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 17
+     "link": 22
     },
     {
      "name": "oracle_samples",
@@ -690,7 +730,7 @@
     {
      "name": "mask",
      "type": "MASK",
-     "link": 18
+     "link": 23
     },
     {
      "name": "audio_latent",
@@ -703,7 +743,7 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      33
+      41
      ]
     }
    ],
@@ -732,7 +772,7 @@
    ],
    "size": [
     380,
-    314
+    392
    ],
    "flags": {},
    "order": 7,
@@ -741,17 +781,41 @@
     {
      "name": "clip",
      "type": "CLIP",
-     "link": 19
+     "link": 24
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 20
+     "link": 25
+    },
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "link": 26,
+     "widget": {
+      "name": "prompt"
+     }
+    },
+    {
+     "name": "width",
+     "type": "INT",
+     "link": 27,
+     "widget": {
+      "name": "width"
+     }
+    },
+    {
+     "name": "height",
+     "type": "INT",
+     "link": 28,
+     "widget": {
+      "name": "height"
+     }
     },
     {
      "name": "length",
      "type": "INT",
-     "link": 21,
+     "link": 29,
      "widget": {
       "name": "length"
      }
@@ -759,7 +823,7 @@
     {
      "name": "first_frame",
      "type": "IMAGE",
-     "link": 22
+     "link": 30
     },
     {
      "name": "last_frame",
@@ -772,7 +836,7 @@
      "name": "positive",
      "type": "CONDITIONING",
      "links": [
-      27
+      35
      ]
     },
     {
@@ -785,9 +849,9 @@
     "Node name for S&R": "MiniMaxH3ImageToVideo"
    },
    "widgets_values": [
-    "integrated_multimodal_description: [Shot 1] anime style, a medium shot frames a woman walking forward through a chaotic, neon-drenched street market at night. Thick steam rolls off cramped food stalls on both sides, catching the harsh glare of overhead magenta and cyan lights. The woman has bright green Hime-cut hair, styled with sharp face-framing sidelocks and blunt bangs. She wears a white low-cut top beneath a structured crop-top mini jacket and a short pleated skirt, and she tightly grips a sleek, bright pink pistol, her knuckles turning white. The camera pulls out at fast speed, tracking backward ahead of her while shaking slightly in a jittery handheld motion. As the woman pushes forward, her green hair whips violently around her cheeks and her boots splash heavily through rain-slicked puddles. Her eyes are wide and darting, and she casts a rapid glance over her shoulder, then turns forward again and ducks beneath a glowing holographic advertisement as the camera keeps retreating in front of her. A deep, rhythmic thrum of industrial bass music echoes through the alleyway from the surrounding market.\n\noverall_soundscape: Her boots splash sharply through rain-slicked puddles with every step, mixing with her ragged breathing. Steam hisses from the crowded food stalls under the low background clamor of the night market.\n\nnon_diegetic_music: N/A",
-    1024,
-    576,
+    "",
+    1344,
+    768,
     124
    ]
   },
@@ -796,7 +860,7 @@
    "type": "LoraLoaderModelOnly",
    "pos": [
     480,
-    586
+    690
    ],
    "size": [
     380,
@@ -809,7 +873,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 23
+     "link": 31
     }
    ],
    "outputs": [
@@ -817,7 +881,7 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      24
+      32
      ]
     }
    ],
@@ -848,7 +912,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 24
+     "link": 32
     }
    ],
    "outputs": [
@@ -856,7 +920,7 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      25
+      33
      ]
     }
    ],
@@ -886,7 +950,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 25
+     "link": 33
     }
    ],
    "outputs": [
@@ -894,8 +958,8 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      26,
-      28
+      34,
+      36
      ]
     }
    ],
@@ -930,12 +994,12 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 26
+     "link": 34
     },
     {
      "name": "conditioning",
      "type": "CONDITIONING",
-     "link": 27
+     "link": 35
     }
    ],
    "outputs": [
@@ -943,7 +1007,7 @@
      "name": "GUIDER",
      "type": "GUIDER",
      "links": [
-      30
+      38
      ]
     }
    ],
@@ -957,7 +1021,7 @@
    "type": "H3InjectSchedule",
    "pos": [
     1740,
-    742
+    768
    ],
    "size": [
     380,
@@ -970,7 +1034,7 @@
     {
      "name": "model",
      "type": "MODEL",
-     "link": 28
+     "link": 36
     }
    ],
    "outputs": [
@@ -978,7 +1042,7 @@
      "name": "SIGMAS",
      "type": "SIGMAS",
      "links": [
-      32
+      40
      ]
     }
    ],
@@ -1012,7 +1076,7 @@
      "name": "NOISE",
      "type": "NOISE",
      "links": [
-      29
+      37
      ]
     }
    ],
@@ -1042,27 +1106,27 @@
     {
      "name": "noise",
      "type": "NOISE",
-     "link": 29
+     "link": 37
     },
     {
      "name": "guider",
      "type": "GUIDER",
-     "link": 30
+     "link": 38
     },
     {
      "name": "sampler",
      "type": "SAMPLER",
-     "link": 31
+     "link": 39
     },
     {
      "name": "sigmas",
      "type": "SIGMAS",
-     "link": 32
+     "link": 40
     },
     {
      "name": "latent_image",
      "type": "LATENT",
-     "link": 33
+     "link": 41
     }
    ],
    "outputs": [
@@ -1070,7 +1134,7 @@
      "name": "output",
      "type": "LATENT",
      "links": [
-      34
+      42
      ]
     },
     {
@@ -1103,12 +1167,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 34
+     "link": 42
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 35
+     "link": 43
     }
    ],
    "outputs": [
@@ -1116,7 +1180,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      36
+      44
      ]
     }
    ],
@@ -1143,12 +1207,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 36
+     "link": 44
     },
     {
      "name": "drawing_map",
      "type": "STRING",
-     "link": 37
+     "link": 45
     }
    ],
    "outputs": [
@@ -1156,7 +1220,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      50
+      58
      ]
     }
    ],
@@ -1171,7 +1235,7 @@
    "type": "VAEDecodeAudio",
    "pos": [
     1740,
-    992
+    1018
    ],
    "size": [
     380,
@@ -1184,12 +1248,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 38
+     "link": 46
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 39
+     "link": 47
     }
    ],
    "outputs": [
@@ -1197,7 +1261,7 @@
      "name": "AUDIO",
      "type": "AUDIO",
      "links": [
-      41
+      49
      ]
     }
    ],
@@ -1225,12 +1289,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 40
+     "link": 48
     },
     {
      "name": "audio",
      "type": "AUDIO",
-     "link": 41
+     "link": 49
     },
     {
      "name": "meta_batch",
@@ -1276,7 +1340,7 @@
    "type": "VAEDecode",
    "pos": [
     1740,
-    1164
+    1190
    ],
    "size": [
     380,
@@ -1289,12 +1353,12 @@
     {
      "name": "samples",
      "type": "LATENT",
-     "link": 42
+     "link": 50
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 43
+     "link": 51
     }
    ],
    "outputs": [
@@ -1302,8 +1366,8 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      46,
-      48
+      54,
+      56
      ]
     }
    ],
@@ -1330,12 +1394,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 44
+     "link": 52
     },
     {
      "name": "oracle_hold_map",
      "type": "STRING",
-     "link": 45
+     "link": 53
     }
    ],
    "outputs": [
@@ -1343,29 +1407,29 @@
      "name": "segment_images",
      "type": "IMAGE",
      "links": [
-      51,
-      55
+      59,
+      63
      ]
     },
     {
      "name": "hold_map",
      "type": "STRING",
      "links": [
-      52
+      60
      ]
     },
     {
      "name": "splice_map",
      "type": "STRING",
      "links": [
-      49
+      57
      ]
     },
     {
      "name": "segment_start",
      "type": "INT",
      "links": [
-      47
+      55
      ]
     },
     {
@@ -1405,12 +1469,12 @@
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 46
+     "link": 54
     },
     {
      "name": "batch_index",
      "type": "INT",
-     "link": 47,
+     "link": 55,
      "widget": {
       "name": "batch_index"
      }
@@ -1421,7 +1485,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      22
+      30
      ]
     }
    ],
@@ -1451,17 +1515,17 @@
     {
      "name": "baseline",
      "type": "IMAGE",
-     "link": 48
+     "link": 56
     },
     {
      "name": "splice_map",
      "type": "STRING",
-     "link": 49
+     "link": 57
     },
     {
      "name": "segment",
      "type": "IMAGE",
-     "link": 50
+     "link": 58
     }
    ],
    "outputs": [
@@ -1469,7 +1533,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      40
+      48
      ]
     }
    ],
@@ -1500,12 +1564,12 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 51
+     "link": 59
     },
     {
      "name": "hold_map",
      "type": "STRING",
-     "link": 52
+     "link": 60
     }
    ],
    "outputs": [
@@ -1513,23 +1577,23 @@
      "name": "images",
      "type": "IMAGE",
      "links": [
-      15,
-      53
+      20,
+      61
      ]
     },
     {
      "name": "drawing_map",
      "type": "STRING",
      "links": [
-      37,
-      54
+      45,
+      62
      ]
     },
     {
      "name": "length",
      "type": "INT",
      "links": [
-      21
+      29
      ]
     },
     {
@@ -1553,7 +1617,7 @@
    "type": "FastDeropeFreezeMask",
    "pos": [
     3000,
-    586
+    664
    ],
    "size": [
     380,
@@ -1566,17 +1630,17 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 53
+     "link": 61
     },
     {
      "name": "map",
      "type": "STRING",
-     "link": 54
+     "link": 62
     },
     {
      "name": "segment_images",
      "type": "IMAGE",
-     "link": 55
+     "link": 63
     }
    ],
    "outputs": [
@@ -1584,7 +1648,7 @@
      "name": "MASK",
      "type": "MASK",
      "links": [
-      18
+      23
      ]
     }
    ],
@@ -1598,9 +1662,165 @@
   },
   {
    "id": 36,
+   "type": "PrimitiveStringMultiline",
+   "pos": [
+    60,
+    1504
+   ],
+   "size": [
+    380,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "links": [
+      4,
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveStringMultiline"
+   },
+   "widgets_values": [
+    "integrated_multimodal_description: [Shot 1] anime style, a medium shot frames a woman walking forward through a chaotic, neon-drenched street market at night. Thick steam rolls off cramped food stalls on both sides, catching the harsh glare of overhead magenta and cyan lights. The woman has bright green Hime-cut hair, styled with sharp face-framing sidelocks and blunt bangs. She wears a white low-cut top beneath a structured crop-top mini jacket and a short pleated skirt, and she tightly grips a sleek, bright pink pistol, her knuckles turning white. The camera pulls out at fast speed, tracking backward ahead of her while shaking slightly in a jittery handheld motion. As the woman pushes forward, her green hair whips violently around her cheeks and her boots splash heavily through rain-slicked puddles. Her eyes are wide and darting, and she casts a rapid glance over her shoulder, then turns forward again and ducks beneath a glowing holographic advertisement as the camera keeps retreating in front of her. A deep, rhythmic thrum of industrial bass music echoes through the alleyway from the surrounding market.\n\noverall_soundscape: Her boots splash sharply through rain-slicked puddles with every step, mixing with her ragged breathing. Steam hisses from the crowded food stalls under the low background clamor of the night market.\n\nnon_diegetic_music: N/A"
+   ],
+   "title": "PROMPT (used by both passes)"
+  },
+  {
+   "id": 37,
+   "type": "PrimitiveInt",
+   "pos": [
+    60,
+    1650
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "INT",
+     "type": "INT",
+     "links": [
+      5,
+      27
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveInt"
+   },
+   "widgets_values": [
+    1024,
+    "fixed"
+   ],
+   "title": "WIDTH (both passes)"
+  },
+  {
+   "id": 38,
+   "type": "PrimitiveInt",
+   "pos": [
+    60,
+    1822
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "INT",
+     "type": "INT",
+     "links": [
+      6,
+      28
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveInt"
+   },
+   "widgets_values": [
+    576,
+    "fixed"
+   ],
+   "title": "HEIGHT (both passes)"
+  },
+  {
+   "id": 39,
+   "type": "PrimitiveInt",
+   "pos": [
+    60,
+    1994
+   ],
+   "size": [
+    380,
+    132
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "INT",
+     "type": "INT",
+     "links": [
+      7,
+      17
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveInt"
+   },
+   "widgets_values": [
+    107,
+    "fixed"
+   ],
+   "title": "LENGTH in frames (17k+5: 124 = 5 s, 226 = 9.4 s, 345 = 14.4 s)"
+  },
+  {
+   "id": 40,
    "type": "Note",
    "pos": [
     60,
+    -420
+   ],
+   "size": [
+    500,
+    380
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "SETUP: files and links\n\n1. taeh3 encoder+decoder (22.7 MB):\nhttps://github.com/madebyollin/taehv/raw/main/safetensors/taeh3.safetensors\nSave it as models/vae_approx/taeh3_full.safetensors. Do NOT overwrite the ~10 MB taeh3.safetensors that may already be there: that one is ComfyUI's live-preview decoder (no encoder), and the Load TAE node will refuse it.\n\n2. MiniMax H3 models: https://huggingface.co/Comfy-Org/MiniMax-H3\n\n3. Node packs: https://github.com/matlowai/ComfyUI-MAINodes and https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite\n\n4. A turbo LoRA for pass 2: the examples use minimax_h3_DMAD_4step_full_lora_avg_rank_39_bf16 at 0.8.\n\nHOW TO USE: type your prompt, width, height and length once in the boxes on the left; both passes read them (they must match). Style LoRA: add a LoraLoaderModelOnly after the UNet loader and connect its output to BOTH the pass-1 MiniMax H3 Sigma Shift and the pass-2 turbo LoRA loader, so both passes draw in the same style."
+   ]
+  },
+  {
+   "id": 41,
+   "type": "Note",
+   "pos": [
+    580,
     -420
    ],
    "size": [
@@ -1618,10 +1838,10 @@
    ]
   },
   {
-   "id": 37,
+   "id": 42,
    "type": "Note",
    "pos": [
-    580,
+    1100,
     -420
    ],
    "size": [
@@ -1666,6 +1886,38 @@
   ],
   [
    4,
+   36,
+   0,
+   8,
+   2,
+   "STRING"
+  ],
+  [
+   5,
+   37,
+   0,
+   8,
+   3,
+   "INT"
+  ],
+  [
+   6,
+   38,
+   0,
+   8,
+   4,
+   "INT"
+  ],
+  [
+   7,
+   39,
+   0,
+   8,
+   5,
+   "INT"
+  ],
+  [
+   8,
    7,
    0,
    9,
@@ -1673,7 +1925,7 @@
    "MODEL"
   ],
   [
-   5,
+   9,
    8,
    0,
    9,
@@ -1681,7 +1933,7 @@
    "CONDITIONING"
   ],
   [
-   6,
+   10,
    7,
    0,
    12,
@@ -1689,7 +1941,7 @@
    "MODEL"
   ],
   [
-   7,
+   11,
    10,
    0,
    13,
@@ -1697,7 +1949,7 @@
    "NOISE"
   ],
   [
-   8,
+   12,
    9,
    0,
    13,
@@ -1705,7 +1957,7 @@
    "GUIDER"
   ],
   [
-   9,
+   13,
    11,
    0,
    13,
@@ -1713,7 +1965,7 @@
    "SAMPLER"
   ],
   [
-   10,
+   14,
    12,
    0,
    13,
@@ -1721,7 +1973,7 @@
    "SIGMAS"
   ],
   [
-   11,
+   15,
    8,
    1,
    13,
@@ -1729,7 +1981,7 @@
    "LATENT"
   ],
   [
-   12,
+   16,
    13,
    0,
    14,
@@ -1737,7 +1989,15 @@
    "LATENT"
   ],
   [
-   13,
+   17,
+   39,
+   0,
+   14,
+   1,
+   "INT"
+  ],
+  [
+   18,
    13,
    0,
    15,
@@ -1745,7 +2005,7 @@
    "LATENT"
   ],
   [
-   14,
+   19,
    6,
    0,
    15,
@@ -1753,7 +2013,7 @@
    "VAE"
   ],
   [
-   15,
+   20,
    34,
    0,
    16,
@@ -1761,7 +2021,7 @@
    "IMAGE"
   ],
   [
-   16,
+   21,
    6,
    0,
    16,
@@ -1769,7 +2029,7 @@
    "VAE"
   ],
   [
-   17,
+   22,
    16,
    0,
    17,
@@ -1777,7 +2037,7 @@
    "LATENT"
   ],
   [
-   18,
+   23,
    35,
    0,
    17,
@@ -1785,7 +2045,7 @@
    "MASK"
   ],
   [
-   19,
+   24,
    2,
    0,
    18,
@@ -1793,7 +2053,7 @@
    "CLIP"
   ],
   [
-   20,
+   25,
    6,
    0,
    18,
@@ -1801,23 +2061,47 @@
    "VAE"
   ],
   [
-   21,
-   34,
-   2,
+   26,
+   36,
+   0,
    18,
    2,
-   "INT"
+   "STRING"
   ],
   [
-   22,
-   32,
+   27,
+   37,
    0,
    18,
    3,
+   "INT"
+  ],
+  [
+   28,
+   38,
+   0,
+   18,
+   4,
+   "INT"
+  ],
+  [
+   29,
+   34,
+   2,
+   18,
+   5,
+   "INT"
+  ],
+  [
+   30,
+   32,
+   0,
+   18,
+   6,
    "IMAGE"
   ],
   [
-   23,
+   31,
    1,
    0,
    19,
@@ -1825,7 +2109,7 @@
    "MODEL"
   ],
   [
-   24,
+   32,
    19,
    0,
    20,
@@ -1833,7 +2117,7 @@
    "MODEL"
   ],
   [
-   25,
+   33,
    20,
    0,
    21,
@@ -1841,7 +2125,7 @@
    "MODEL"
   ],
   [
-   26,
+   34,
    21,
    0,
    22,
@@ -1849,7 +2133,7 @@
    "MODEL"
   ],
   [
-   27,
+   35,
    18,
    0,
    22,
@@ -1857,7 +2141,7 @@
    "CONDITIONING"
   ],
   [
-   28,
+   36,
    21,
    0,
    23,
@@ -1865,7 +2149,7 @@
    "MODEL"
   ],
   [
-   29,
+   37,
    24,
    0,
    25,
@@ -1873,7 +2157,7 @@
    "NOISE"
   ],
   [
-   30,
+   38,
    22,
    0,
    25,
@@ -1881,7 +2165,7 @@
    "GUIDER"
   ],
   [
-   31,
+   39,
    11,
    0,
    25,
@@ -1889,7 +2173,7 @@
    "SAMPLER"
   ],
   [
-   32,
+   40,
    23,
    0,
    25,
@@ -1897,7 +2181,7 @@
    "SIGMAS"
   ],
   [
-   33,
+   41,
    17,
    0,
    25,
@@ -1905,7 +2189,7 @@
    "LATENT"
   ],
   [
-   34,
+   42,
    25,
    0,
    26,
@@ -1913,7 +2197,7 @@
    "LATENT"
   ],
   [
-   35,
+   43,
    4,
    0,
    26,
@@ -1921,7 +2205,7 @@
    "VAE"
   ],
   [
-   36,
+   44,
    26,
    0,
    27,
@@ -1929,7 +2213,7 @@
    "IMAGE"
   ],
   [
-   37,
+   45,
    34,
    1,
    27,
@@ -1937,7 +2221,7 @@
    "STRING"
   ],
   [
-   38,
+   46,
    13,
    0,
    28,
@@ -1945,7 +2229,7 @@
    "LATENT"
   ],
   [
-   39,
+   47,
    5,
    0,
    28,
@@ -1953,7 +2237,7 @@
    "VAE"
   ],
   [
-   40,
+   48,
    33,
    0,
    29,
@@ -1961,7 +2245,7 @@
    "IMAGE"
   ],
   [
-   41,
+   49,
    28,
    0,
    29,
@@ -1969,7 +2253,7 @@
    "AUDIO"
   ],
   [
-   42,
+   50,
    13,
    0,
    30,
@@ -1977,7 +2261,7 @@
    "LATENT"
   ],
   [
-   43,
+   51,
    4,
    0,
    30,
@@ -1985,7 +2269,7 @@
    "VAE"
   ],
   [
-   44,
+   52,
    15,
    0,
    31,
@@ -1993,7 +2277,7 @@
    "IMAGE"
   ],
   [
-   45,
+   53,
    14,
    0,
    31,
@@ -2001,7 +2285,7 @@
    "STRING"
   ],
   [
-   46,
+   54,
    30,
    0,
    32,
@@ -2009,7 +2293,7 @@
    "IMAGE"
   ],
   [
-   47,
+   55,
    31,
    3,
    32,
@@ -2017,7 +2301,7 @@
    "INT"
   ],
   [
-   48,
+   56,
    30,
    0,
    33,
@@ -2025,7 +2309,7 @@
    "IMAGE"
   ],
   [
-   49,
+   57,
    31,
    2,
    33,
@@ -2033,7 +2317,7 @@
    "STRING"
   ],
   [
-   50,
+   58,
    27,
    0,
    33,
@@ -2041,7 +2325,7 @@
    "IMAGE"
   ],
   [
-   51,
+   59,
    31,
    0,
    34,
@@ -2049,7 +2333,7 @@
    "IMAGE"
   ],
   [
-   52,
+   60,
    31,
    1,
    34,
@@ -2057,7 +2341,7 @@
    "STRING"
   ],
   [
-   53,
+   61,
    34,
    0,
    35,
@@ -2065,7 +2349,7 @@
    "IMAGE"
   ],
   [
-   54,
+   62,
    34,
    1,
    35,
@@ -2073,7 +2357,7 @@
    "STRING"
   ],
   [
-   55,
+   63,
    31,
    0,
    35,
