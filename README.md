@@ -3,11 +3,13 @@
 A cheaper, smarter **de-rope** for **MiniMax H3**: the fix for fast-motion smearing and melting, at roughly half
 the extra cost, and only where a shot actually needs it.
 
-![plain H3 vs MAINodes de-rope vs FastDerope](assets/demo_plainH3_sword_fight.gif)
+![plain H3 vs MAINodes de-rope vs FastDerope, with render times](assets/demo_gate_park_kick.gif)
 
-*Plain H3 (no LoRA), 1024×576, 5 s sword fight, half speed. Left: plain render, the warrior smears into the slash.
-Middle: [MAINodes](https://github.com/matlowai/ComfyUI-MAINodes) de-rope. Right: this pack. Same fix, 160 s instead
-of 233 s (a plain render is 98 s).* ([mp4](assets/demo_plainH3_sword_fight.mp4))
+*Plain H3 (no LoRA), 1024×576, a 10 s clip that is mostly talking with one fast kick. Top left: plain render, the girl
+smears into a ghost on the kick. Top right: [MAINodes](https://github.com/matlowai/ComfyUI-MAINodes) de-rope, which
+slows and redraws the fastest quarter of the whole clip. Bottom left: this pack. The Motion Gate finds the kick and
+redraws only that, so the fix costs **+12 s instead of +202 s** (205 s plain, 407 s MAINodes, 217 s FastDerope; every
+run from scratch on an RTX 5090).* ([mp4](assets/demo_gate_park_kick.mp4))
 
 The de-rope itself (slow the fast spans down, redraw them, drop the extra frames) is **MAINodes' work** by
 matlowai. This pack makes it cheaper and gates it; you need MAINodes installed.
@@ -102,6 +104,12 @@ Drawing De-rope on 2s vs the per-frame FastDerope, pass-2 seconds only (same pas
 
 On 3s it is cheaper still, but fast fists came out ghosted; fixed-phase 2s (no key poses) is 22-40% cheaper but can
 land an impact a frame or two late.
+
+![plain H3 vs MAINodes de-rope vs FastDerope, sword fight](assets/demo_plainH3_sword_fight.gif)
+
+*All action, so the gate can't skip anything: plain H3 sword fight, half speed. Left: plain (98 s), the warrior smears
+into the slash. Middle: MAINodes de-rope (233 s). Right: FastDerope v0.1 (160 s).*
+([mp4](assets/demo_plainH3_sword_fight.mp4))
 
 Graded by eye on the fastest frames: same choreography and the same smear fixes as MAINodes' de-rope on
 Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
