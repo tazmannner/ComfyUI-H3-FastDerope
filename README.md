@@ -65,7 +65,8 @@ pass 1 (normal render + audio)
    mouths look off. The Motion Gate measures motion in absolute terms: optical flow on pass 1, camera pans removed,
    summed over 4-frame windows (one latent token). Only motion above 0.09 frame widths per window for at least 5
    windows counts. Isolated whole-frame changes are shot cuts (ignored); clustered ones (explosions, flashes) count
-   as action. Only the burst plus 12-frame handles is redrawn. **If nothing is extreme, pass 2 never runs.**
+   as action. Only the burst plus 12-frame handles is redrawn, and calm shots *between* bursts are left out of the
+   redraw entirely (they stay pass 1 as rendered). **If nothing is extreme, pass 2 never runs.**
 2. **H3 Window Attention for the redraw.** Each video frame attends *exactly* to its neighbours (±4 latent frames),
    every 8th frame as an anchor, and all text, audio and first-frame rows. Attention cost becomes roughly linear in
    clip length: **pass 2 ~35-40% faster**, and fast poses came out as crisp as with full attention or crisper (a punch
@@ -88,10 +89,14 @@ pass 1 (normal render + audio)
    of the same moment into a see-through double image. *Freeze Mask* locks the outer handle frames to pass 1 inside
    pass 2 (via H3 V2V Init, `time_varying` on), so the crossfade only blends pass 1 with itself. If a shot cut falls
    inside a handle, the Motion Gate ends the redraw exactly on the cut instead (hard switch, no crossfade).
-6. **Static background lock.** Regions that don't move in pass 1 are frozen in pass 2 too, and Segment Splice pastes
-   pass 1's own pixels back there (`restore_static`): the background keeps its full detail and stops shimmering.
-   Fine-edge detail in redrawn static-camera shots went from 87% to 94% of pass 1's; moving-camera shots are
-   unaffected.
+6. **Static background lock.** Regions that stay still for a whole shot in pass 1 are frozen in pass 2 too, and
+   Segment Splice pastes pass 1's own pixels back there (`restore_static`): the background keeps its full detail and
+   can't shimmer. The Motion Gate decides this once per shot and hands the same map to both nodes, so a region is
+   never switched between pass 1 and the redraw from one frame to the next.
+7. **Calm shots between bursts stay pass 1.** A redraw starts from 92% noise, so redrawing calm frames only
+   reinvents faces and backgrounds from frame to frame. When two bursts are far apart, the gap between them is left
+   out of pass 2 (it is also cheaper); its edges are switched on a shot cut or locked and crossfaded like the outer
+   edges.
 
 ## Results (RTX 5090)
 
@@ -139,7 +144,7 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 
 | node | what it does |
 |---|---|
-| **Motion Gate (de-rope only extreme motion)** | IMAGE (pass 1, a taeh3 decode is enough) + MAINodes oracle `hold_map` → cropped burst frames, segment `hold_map`, `splice_map`, `segment_start`, report. Ends the burst on a shot cut when one falls in a handle; `freeze_frames` (8) marks the outer handle frames to lock |
+| **Motion Gate (de-rope only extreme motion)** | IMAGE (pass 1, a taeh3 decode is enough) + MAINodes oracle `hold_map` → cropped burst frames, segment `hold_map`, `splice_map`, `segment_start`, report. Ends a burst on a shot cut when one falls in a handle, leaves calm gaps between bursts out of the redraw, marks the handle frames to lock (`freeze_frames` 8) and the per-shot static background (`static_threshold` 0.03) |
 | **H3 Window Attention (fast de-rope pass)** | MODEL patch for pass 2: temporal window attention (`window` latent frames each side, `anchor_stride`, `chunk`); calls under `min_frames` latent frames stay dense |
 | **Freeze Mask (lock splice handles to pass 1)** | per-frame regenerate/freeze MASK for H3 V2V Init (set `time_varying` on): locks the gate's outer handle frames and, with `segment_images`, the static background (`static_threshold` 0.03) |
 | **Segment Splice (skip pass 2 if calm)** | pastes the recovered burst into the full-quality pass 1; lazy input, so pass 2 only runs when the gate found something. `frozen` keeps the crossfade inside the locked frames; `restore_static` (0.03) pastes pass 1's pixels on static regions |
@@ -195,10 +200,9 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 ## Limitations
 
 - The gate misses brief flash-melts that don't come with sustained motion (one Edgerunners i2v head-flash).
-- Multiple bursts far apart are redrawn as one window from the first to the last burst.
 - Fast-moving characters in a redrawn burst lose some fine detail compared to the plain render (pass 2 redraws them
-  from 92% noise with a turbo LoRA); they are crisp, not blurred or melted. Static backgrounds keep pass 1's detail
-  (v0.3), moving-camera shots don't benefit from that. Thin repeated patterns (chain-link fences) can pick up
+  from 92% noise with a turbo LoRA); they are crisp, not blurred or melted. Backgrounds that stay still for a whole
+  shot keep pass 1's detail (v0.3); moving-camera shots don't benefit from that. Thin repeated patterns (chain-link fences) can pick up
   artifacts in pass 2.
 - The v0.3 locks add ~4-5 s to pass 2 on clips that are action all the way through.
 - On a very short burst the Drawing De-rope saves almost nothing over workflow 01.
@@ -206,8 +210,9 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
-- **v0.3.0**: no more ghosting at splice edges (Freeze Mask + cut-aware Motion Gate); static background lock with
-  pass-1 pixel restore; Color Anchor (experimental); clearer taeh3 error; new header demo.
+- **v0.3.0**: no more ghosting at splice edges (Freeze Mask + cut-aware Motion Gate); calm shots between bursts stay
+  pass 1 (no more faces and backgrounds changing frame to frame there); per-shot static background lock with pass-1
+  pixel restore; Color Anchor (experimental); clearer taeh3 error; new header demos.
 - **v0.2.0**: Drawing De-rope (Drawing Smear / Recover, workflow 03).
 - **v0.1.0**: Window Attention, Motion Gate + Segment Splice, taeh3 loader.
 

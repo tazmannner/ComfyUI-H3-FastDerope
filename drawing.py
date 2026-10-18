@@ -191,7 +191,8 @@ class FastDeropeDrawingSmear:
                 keys_found.extend(ks)
                 return st, ks
         src, groups, slots = plan_drawings(holds, hot, every, starts_for, key_tokens)
-        dm = {"world_len": n, "src": src, "groups": groups, "slots": slots, "every": every, "freeze": hm.get("freeze") or []}
+        dm = {"world_len": n, "src": src, "groups": groups, "slots": slots, "every": every, "freeze": hm.get("freeze") or [],
+              "static": hm.get("static")}
         n_hot = int(sum(hot))
         report = (f"DrawingSmear: {n} segment frames ({n_hot} hot) -> {len(slots)} drawings on {every}s; "
                   f"{len(src)} frames to redraw (a hold-4 de-rope of the hot span alone would be {4 * n_hot})"

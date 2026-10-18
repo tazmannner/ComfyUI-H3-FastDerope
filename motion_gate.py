@@ -97,7 +97,7 @@ def hot_frames(speed, cut, thr, min_windows, margin):
     return hot
 
 
-def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=()):
+def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=(), min_gap=24):
     """Hold map for the cropped segment, handles at hold 1. Inside hot spans: the oracle's own per-frame holds
     (min 2) when given, else d_max; one-step-per-4-frames ramps outside them.
     Returns (a, b) inclusive crop bounds and the per-frame holds of the segment, or None if nothing is hot."""
@@ -123,7 +123,33 @@ def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=()):
         a = max(cin)
     if cout:
         b = min(cout) - 1
-    return int(a), int(b), [int(h) for h in holds[a:b + 1]], bool(cin), bool(cout)
+    seg = holds[a:b + 1].copy()
+    # Calm stretches BETWEEN bursts (further than `handle` from any hot frame, at least min_gap long) are dropped from
+    # the redraw (hold 0) and come straight from pass 1. Redrawing them only reinvented faces and backgrounds frame to
+    # frame. Each side of a gap is a segment edge like the outer ones: switched on a shot cut if one is in the handle.
+    gaps = []
+    hidx = np.where(holds > 1)[0]                     # burst frames incl. their slowed shoulders
+    dist_held = np.full(n, 10 ** 6)
+    for i in hidx:
+        dist_held = np.minimum(dist_held, np.abs(np.arange(n) - i))
+    hot_idx = np.where(np.asarray(hot, bool))[0]
+    far = (dist_held[a:b + 1] > handle) & ~np.asarray(hot[a:b + 1], bool)
+    for g0, ln in _runs(far):
+        g1 = g0 + ln - 1
+        if ln < min_gap or g0 == 0 or g1 == len(seg) - 1:
+            continue
+        lh = hot_idx[hot_idx < a + g0].max()           # last hot frame before the gap
+        rh = hot_idx[hot_idx > a + g1].min()           # first hot frame after it
+        cl = sorted(int(c) for c in cuts if lh < c <= a + g0)
+        cr = sorted(int(c) for c in cuts if a + g1 < c <= rh)
+        if cl:
+            g0 = cl[0] - a                             # a calm shot starts at the cut: all of it stays pass 1
+        if cr:
+            g1 = cr[-1] - 1 - a                        # the next burst's shot starts at its cut
+        if g1 >= g0:
+            seg[g0:g1 + 1] = 0
+            gaps.append([int(g0), int(g1), bool(cl), bool(cr)])
+    return int(a), int(b), [int(h) for h in seg], bool(cin), bool(cout), gaps
 
 
 class FastDeropeMotionGate:
@@ -141,6 +167,9 @@ class FastDeropeMotionGate:
             "d_max": ("INT", {"default": 4, "min": 2, "max": 8, "tooltip": "slow-down factor on hot frames"}),
             "handle_frames": ("INT", {"default": 12, "min": 2, "max": 48, "tooltip": "real-time context kept on each side of the burst"}),
         }, "optional": {
+            "static_threshold": ("FLOAT", {"default": 0.03, "min": 0.0, "max": 1.0, "step": 0.005,
+                                 "tooltip": "regions still for a whole shot (grey change below this, per 16 px cell) keep "
+                                            "pass 1's pixels (Freeze Mask + Segment Splice). 0 = redraw the whole frame"}),
             "freeze_frames": ("INT", {"default": 8, "min": 0, "max": 48,
                               "tooltip": "outer handle frames to lock to pass 1 in pass 2 (needs Freeze Mask -> V2V Init); "
                                          "the splice crossfade then never blends two different takes"}),
@@ -156,7 +185,8 @@ class FastDeropeMotionGate:
                    "Anime Cadence Segment Splice. Calm clips (dialogue, gentle motion) come out with active=false and the "
                    "splice node then skips pass 2 entirely.")
 
-    def gate(self, images, threshold, min_windows, margin, d_max, handle_frames, oracle_hold_map=None, freeze_frames=8):
+    def gate(self, images, threshold, min_windows, margin, d_max, handle_frames, oracle_hold_map=None, freeze_frames=8,
+             static_threshold=0.03):
         import json
         frames = images.detach().cpu().numpy()
         speed, cut = measure(frames)
@@ -170,7 +200,7 @@ class FastDeropeMotionGate:
             rep = (f"MotionGate: nothing extreme (max window {float(np.convolve(speed * ~cut, np.ones(4), 'valid').max()):.3f} "
                    f"vs threshold {threshold}); pass 2 will be skipped. cuts at {np.where(cut)[0].tolist()}")
             return (images[:1], json.dumps({"holds": [1], "world_len": 1}), json.dumps(splice), 0, rep)
-        a, b, holds, hard_in, hard_out = plan
+        a, b, holds, hard_in, hard_out, gaps = plan
         held = [i for i, h in enumerate(holds) if h > 1]
         h_in, h_out = held[0], len(holds) - 1 - held[-1]
         # Outer handle frames to lock to pass 1 inside pass 2 (wire FastDerope Freeze Mask -> H3 V2V Init): the splice
@@ -178,14 +208,31 @@ class FastDeropeMotionGate:
         f_in = 0 if hard_in else max(0, min(freeze_frames, h_in - 4))
         f_out = 0 if hard_out else max(0, min(freeze_frames, h_out - 4))
         freeze = [1 if (i < f_in or i >= len(holds) - f_out) else 0 for i in range(len(holds))]
+        for gp in gaps:                                   # lock the frames next to each calm gap the same way
+            g0, g1, hl, hr = gp
+            left = [i for i in range(g0) if holds[i] > 1]
+            right = [i for i in range(g1 + 1, len(holds)) if holds[i] > 1]
+            fl = 0 if hl or not left else max(0, min(freeze_frames, g0 - left[-1] - 1 - 4))
+            fr = 0 if hr or not right else max(0, min(freeze_frames, right[0] - g1 - 1 - 4))
+            for i in range(g0 - fl, g0):
+                freeze[i] = 1
+            for i in range(g1 + 1, g1 + 1 + fr):
+                freeze[i] = 1
+            gp += [fl, fr]
         splice = {"active": True, "start": a, "end": b, "world_len": n, "handle_in": h_in, "handle_out": h_out,
-                  "hard_in": hard_in, "hard_out": hard_out, "freeze_in": f_in, "freeze_out": f_out}
+                  "hard_in": hard_in, "hard_out": hard_out, "freeze_in": f_in, "freeze_out": f_out, "gaps": gaps}
         rep = (f"MotionGate: hot frames {runs}; regenerate f{a}-f{b} ({b - a + 1} of {n} frames, "
                f"{sum(holds)} slowed frames); cuts at {np.where(cut)[0].tolist()}; edges: "
-               f"{'cut' if hard_in else f'freeze {f_in}'} / {'cut' if hard_out else f'freeze {f_out}'}")
+               f"{'cut' if hard_in else f'freeze {f_in}'} / {'cut' if hard_out else f'freeze {f_out}'}"
+               + (f"; calm gaps kept from pass 1: {[(a + g[0], a + g[1]) for g in gaps]}" if gaps else ""))
         print("[FastDerope] " + rep)
         # "hot" marks the sustained-fast frames themselves (not shoulders/handles): Drawing Smear redraws only those as drawings
         seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]], "freeze": freeze}
+        if static_threshold > 0:
+            smap = shot_static_map(images[a:b + 1].detach().cpu(), static_threshold,
+                                   [c - a for c in np.where(cut)[0] if a < c <= b])
+            seg_map["static"] = smap
+            splice["static"] = smap
         return (images[a:b + 1], json.dumps(seg_map), json.dumps(splice), a, rep)
 
 
@@ -243,14 +290,27 @@ class FastDeropeSegmentSplice:
             fo = min(fo, sp["freeze_out"])
         keep = None
         if restore_static > 0:
-            st = static_cells(out[a:b + 1], restore_static)                         # [n,gh,gw] 1 = static in pass 1
+            if sp.get("static"):
+                st = static_per_frame(sp["static"], n)                              # the gate's per-shot map
+            else:
+                st = static_per_frame(shot_static_map(out[a:b + 1], restore_static), n)
             keep = torch.nn.functional.interpolate(st[:, None], size=out.shape[1:3], mode="bilinear",
                                                    align_corners=False)[:, 0, :, :, None]
             keep = torch.nn.functional.avg_pool2d(keep[..., 0][:, None], 9, 1, 4)[:, 0, :, :, None]  # soft edge
+        wts = [1.0] * n
+        for g0, g1, hl, hr, fl, fr in sp.get("gaps", []):
+            for i in range(g0, g1 + 1):
+                wts[i] = 0.0                             # calm gap between bursts: pass 1 as rendered
+            kl = 0 if hl else min(feather_frames, fl if frozen else feather_frames)
+            kr = 0 if hr else min(feather_frames, fr if frozen else feather_frames)
+            for k in range(1, kl + 1):
+                wts[g0 - k] = min(wts[g0 - k], k / (kl + 1))
+            for k in range(1, kr + 1):
+                wts[g1 + k] = min(wts[g1 + k], k / (kr + 1))
         for i in range(n):
-            w = 1.0
+            w = wts[i]
             if fi and i < fi:
-                w = (i + 1) / (fi + 1)
+                w = min(w, (i + 1) / (fi + 1))
             j = n - 1 - i
             if fo and j < fo:
                 w = min(w, (j + 1) / (fo + 1))
@@ -276,6 +336,43 @@ def static_cells(frames, thr, grow=1, cell=16):
     if grow:
         moving = F.max_pool2d(moving[:, None], 2 * grow + 1, 1, grow)[:, 0]
     return 1.0 - moving
+
+
+def shot_static_map(frames, thr, cuts=()):
+    """Time-STABLE static map: a 16 px cell counts as static only if it is still in EVERY frame of its shot (shots split
+    at `cuts`, frame indices into `frames`). Per-frame decisions flicker: a cell that flips between pass 1's pixels and
+    the redraw from frame to frame shows up as shifting colours. Returns a JSON-able dict."""
+    import torch
+    import torch.nn.functional as F
+    g = frames[..., :3].float().mean(-1)
+    T = g.shape[0]
+    d = torch.zeros_like(g)
+    for k in (-2, -1, 1, 2):
+        idx = torch.clamp(torch.arange(T) + k, 0, T - 1)
+        d = torch.maximum(d, (g - g[idx]).abs())
+    c = F.avg_pool2d(d[:, None], 16, 16, ceil_mode=True)[:, 0]                # [T,gh,gw] per-cell motion
+    bounds = [0] + sorted(int(x) for x in cuts if 0 < x < T) + [T]
+    pieces = []
+    for s, e in zip(bounds[:-1], bounds[1:]):
+        if e <= s:
+            continue
+        cs = c[s:e]
+        # still in >= 85% of the shot's frames and never a big move: keeps pass 1 (its own small motion included)
+        keep = ((cs >= thr).float().mean(0) <= 0.15) & (cs.amax(0) < 5 * thr)
+        moving = F.max_pool2d((~keep).float()[None, None], 3, 1, 1)[0, 0]      # one-cell margin around motion
+        pieces.append([s, e, "".join("1" if v < 0.5 else "0" for v in moving.flatten().tolist())])
+    return {"grid": [int(c.shape[1]), int(c.shape[2])], "pieces": pieces}
+
+
+def static_per_frame(smap, n):
+    """dict from shot_static_map -> [n, gh, gw] float tensor (1 = keep pass 1)."""
+    import torch
+    gh, gw = smap["grid"]
+    out = torch.zeros(n, gh, gw)
+    for s, e, bits in smap["pieces"]:
+        cells = torch.tensor([1.0 if ch == "1" else 0.0 for ch in bits]).reshape(gh, gw)
+        out[s:min(e, n)] = cells
+    return out
 
 
 class FastDeropeFreezeMask:
@@ -313,8 +410,12 @@ class FastDeropeFreezeMask:
         t = images.shape[0]
         assert len(world) == t, (len(world), t)
         live = torch.tensor([0.0 if (w < len(freeze) and freeze[w]) else 1.0 for w in world])
-        if segment_images is None or static_threshold <= 0:
+        if m.get("static"):
+            st = static_per_frame(m["static"], m.get("world_len", max(world) + 1))
+        elif segment_images is not None and static_threshold > 0:
+            seg = segment_images.detach().cpu()
+            st = static_per_frame(shot_static_map(seg, static_threshold), seg.shape[0])
+        else:
             return (live[:, None, None].expand(t, 8, 8).contiguous(),)
-        st = static_cells(segment_images.detach().cpu(), static_threshold)        # [world, gh, gw]
         st = st[torch.tensor(world).clamp(max=st.shape[0] - 1)]                    # onto the slowed clock
         return ((live[:, None, None] * (1.0 - st)).contiguous(),)
