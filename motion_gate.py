@@ -174,6 +174,9 @@ class FastDeropeMotionGate:
                               "tooltip": "outer handle frames to lock to pass 1 in pass 2 (needs Freeze Mask -> V2V Init); "
                                          "the splice crossfade then never blends two different takes"}),
             "oracle_hold_map": ("STRING", {"forceInput": True, "tooltip": "H3 Jerk Oracle hold_map: its per-frame slow-down is used inside the hot spans"}),
+            "static_images": ("IMAGE", {"tooltip": "the full-quality decode of pass 1 (the splice baseline), used only for the "
+                              "static-background map. A taeh3 decode shimmers on fine texture (foliage, grass), so those "
+                              "regions would not count as still and get redrawn with fresh shimmer"}),
         }}
 
     RETURN_TYPES = ("IMAGE", "STRING", "STRING", "INT", "STRING")
@@ -186,7 +189,7 @@ class FastDeropeMotionGate:
                    "splice node then skips pass 2 entirely.")
 
     def gate(self, images, threshold, min_windows, margin, d_max, handle_frames, oracle_hold_map=None, freeze_frames=8,
-             static_threshold=0.03):
+             static_threshold=0.03, static_images=None):
         import json
         frames = images.detach().cpu().numpy()
         speed, cut = measure(frames)
@@ -229,7 +232,8 @@ class FastDeropeMotionGate:
         # "hot" marks the sustained-fast frames themselves (not shoulders/handles): Drawing Smear redraws only those as drawings
         seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]], "freeze": freeze}
         if static_threshold > 0:
-            smap = shot_static_map(images[a:b + 1].detach().cpu(), static_threshold,
+            src = static_images if static_images is not None and static_images.shape[0] == images.shape[0] else images
+            smap = shot_static_map(src[a:b + 1].detach().cpu(), static_threshold,
                                    [c - a for c in np.where(cut)[0] if a < c <= b])
             seg_map["static"] = smap
             splice["static"] = smap

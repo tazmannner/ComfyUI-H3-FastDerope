@@ -1,6 +1,6 @@
 {
  "last_node_id": 43,
- "last_link_id": 66,
+ "last_link_id": 67,
  "nodes": [
   {
    "id": 1,
@@ -697,7 +697,7 @@
      "type": "IMAGE",
      "links": [
       22,
-      64
+      65
      ]
     },
     {
@@ -705,7 +705,7 @@
      "type": "STRING",
      "links": [
       47,
-      65
+      66
      ]
     },
     {
@@ -1296,7 +1296,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      63
+      64
      ]
     }
    ],
@@ -1563,7 +1563,8 @@
      "type": "IMAGE",
      "links": [
       59,
-      61
+      60,
+      62
      ]
     }
    ],
@@ -1581,7 +1582,7 @@
    ],
    "size": [
     380,
-    314
+    340
    ],
    "flags": {},
    "order": 5,
@@ -1596,6 +1597,11 @@
      "name": "oracle_hold_map",
      "type": "STRING",
      "link": 58
+    },
+    {
+     "name": "static_images",
+     "type": "IMAGE",
+     "link": 59
     }
    ],
    "outputs": [
@@ -1604,7 +1610,7 @@
      "type": "IMAGE",
      "links": [
       20,
-      66
+      67
      ]
     },
     {
@@ -1618,14 +1624,14 @@
      "name": "splice_map",
      "type": "STRING",
      "links": [
-      62
+      63
      ]
     },
     {
      "name": "segment_start",
      "type": "INT",
      "links": [
-      60
+      61
      ]
     },
     {
@@ -1665,12 +1671,12 @@
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 59
+     "link": 60
     },
     {
      "name": "batch_index",
      "type": "INT",
-     "link": 60,
+     "link": 61,
      "widget": {
       "name": "batch_index"
      }
@@ -1711,17 +1717,17 @@
     {
      "name": "baseline",
      "type": "IMAGE",
-     "link": 61
+     "link": 62
     },
     {
      "name": "splice_map",
      "type": "STRING",
-     "link": 62
+     "link": 63
     },
     {
      "name": "segment",
      "type": "IMAGE",
-     "link": 63
+     "link": 64
     }
    ],
    "outputs": [
@@ -1761,17 +1767,17 @@
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 64
+     "link": 65
     },
     {
      "name": "map",
      "type": "STRING",
-     "link": 65
+     "link": 66
     },
     {
      "name": "segment_images",
      "type": "IMAGE",
-     "link": 66
+     "link": 67
     }
    ],
    "outputs": [
@@ -2438,12 +2444,20 @@
    59,
    33,
    0,
+   34,
+   2,
+   "IMAGE"
+  ],
+  [
+   60,
+   33,
+   0,
    35,
    0,
    "IMAGE"
   ],
   [
-   60,
+   61,
    34,
    3,
    35,
@@ -2451,7 +2465,7 @@
    "INT"
   ],
   [
-   61,
+   62,
    33,
    0,
    36,
@@ -2459,7 +2473,7 @@
    "IMAGE"
   ],
   [
-   62,
+   63,
    34,
    2,
    36,
@@ -2467,7 +2481,7 @@
    "STRING"
   ],
   [
-   63,
+   64,
    28,
    0,
    36,
@@ -2475,7 +2489,7 @@
    "IMAGE"
   ],
   [
-   64,
+   65,
    16,
    0,
    37,
@@ -2483,7 +2497,7 @@
    "IMAGE"
   ],
   [
-   65,
+   66,
    16,
    1,
    37,
@@ -2491,7 +2505,7 @@
    "STRING"
   ],
   [
-   66,
+   67,
    34,
    0,
    37,
