@@ -96,7 +96,8 @@ pass 1 (normal render + audio)
 7. **Calm shots between bursts stay pass 1.** A redraw starts from 92% noise, so redrawing calm frames only
    reinvents faces and backgrounds from frame to frame. When two bursts are far apart, the gap between them is left
    out of pass 2 (it is also cheaper); its edges are switched on a shot cut or locked and crossfaded like the outer
-   edges.
+   edges. A burst never reaches across a cut into a still shot: pass 2 has no audio, so a talking face it redraws
+   loses its lip sync.
 
 ## Results (RTX 5090)
 
@@ -210,6 +211,10 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
+- **v0.3.4**: dialogue next to a burst keeps its lip sync. A burst in one shot no longer slows and redraws the end of
+  a still shot before the cut (or the start of one after it), and calm stretches between bursts stay pass 1 from 12
+  frames (was 24; new Motion Gate input `min_calm_gap`). Pass 2 has no audio, so a redrawn talking face froze its
+  mouth. Fight clips with motion on both sides of a cut get the same plan as before.
 - **v0.3.3**: the static-background map comes from the full-quality decode (new Motion Gate input `static_images`, wired in the examples) instead of the taeh3 preview, which shimmers on fine texture: live-action foliage now counts as still and no longer boils in the redrawn span. No extra time.
 - **v0.3.2**: easier examples: one prompt / width / height / length box drives both passes, a setup note with download links, taeh3 saved as `taeh3_full.safetensors` (no clash with the preview decoder).
 - **v0.3.1**: no more thin streak / "wire" lines in the redrawn part (worst on live action). Pass 2's first-frame pin was encoded with the full VAE while the rest of pass 2's input is taeh3; the model got two different latents for the same frame and resolved the conflict with streaks. The pin now uses taeh3 too (same cost). If you built your own copy of the workflows, wire pass 2's MiniMax H3 Image to Video `vae` input to the taeh3 loader.

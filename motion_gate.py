@@ -79,7 +79,7 @@ def _runs(mask):
     return out
 
 
-def hot_frames(speed, cut, thr, min_windows, margin):
+def hot_frames(speed, cut, thr, min_windows, margin, still_thr=0.015):
     """Frames inside sustained fast motion: 4-frame windows (one H3 latent token) whose summed speed > thr,
     kept only in runs of >= min_windows windows, grown by margin frames. Shot cuts never count."""
     s = speed.copy()
@@ -94,10 +94,49 @@ def hot_frames(speed, cut, thr, min_windows, margin):
         idx = np.where(hot)[0]
         for i in idx:
             hot[max(0, i - margin):min(n, i + margin + 1)] = True
-    return hot
+    # A burst may spill across a shot cut (a window straddling it, the margin) into the neighbouring shot, which helps
+    # when that shot moves too (smeared frames read slow to optical flow). But never into a STILL shot: a talking head
+    # just before a cut to an action close-up would get redrawn, and pass 2 has no audio (the mouth freezes).
+    return hot & ~(still_frames(speed, cut, still_thr) & ~_own_shot_hot(s, cut, thr, margin))
 
 
-def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=(), min_gap=24):
+def _shot_windows(s, cut):
+    """[(first_frame, 4-frame window sums over that shot's frames alone)] per shot"""
+    sid = np.cumsum(cut)
+    out = []
+    for k in np.unique(sid):
+        fr = np.where(sid == k)[0]
+        sk = s[fr[0]:fr[-1] + 1]
+        out.append((int(fr[0]), len(sk), np.convolve(sk, np.ones(4), "valid") if len(sk) >= 4 else None))
+    return out
+
+
+def _own_shot_hot(s, cut, thr, margin):
+    own = np.zeros(len(s), bool)
+    for f0, ln_s, w in _shot_windows(s, cut):
+        if w is None:
+            continue
+        for a, ln in _runs(w > thr):
+            own[f0 + max(0, a - margin):f0 + min(ln_s, a + ln + 3 + margin)] = True
+    return own
+
+
+def still_frames(speed, cut, still_thr=0.015):
+    """True where the shot is (nearly) still: every 4-frame window over the frame's own shot that covers it sums below
+    still_thr (frame widths). Shots shorter than 4 frames never count as still."""
+    s = speed.copy()
+    s[cut] = 0.0
+    still = np.zeros(len(s), bool)
+    for f0, ln_s, w in _shot_windows(s, cut):
+        if w is None:
+            continue
+        for i in range(ln_s):
+            cover = w[max(0, i - 3):min(len(w), i + 1)]
+            still[f0 + i] = len(cover) > 0 and cover.max() < still_thr
+    return still
+
+
+def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=(), min_gap=12, still=None):
     """Hold map for the cropped segment, handles at hold 1. Inside hot spans: the oracle's own per-frame holds
     (min 2) when given, else d_max; one-step-per-4-frames ramps outside them.
     Returns (a, b) inclusive crop bounds and the per-frame holds of the segment, or None if nothing is hot."""
@@ -105,9 +144,14 @@ def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=(), min_gap=24):
     if not hot.any():
         return None
     idx = np.where(hot)[0]
+    sid = np.zeros(n, int)                            # shot id per frame: slowed shoulders never reach into a still shot
+    for c in cuts:
+        if 0 < int(c) < n:
+            sid[int(c):] += 1
+    blocked = np.zeros(n, bool) if still is None else np.asarray(still, bool)
     dist = np.full(n, 10 ** 6)
     for i in idx:
-        dist = np.minimum(dist, np.abs(np.arange(n) - i))
+        dist = np.minimum(dist, np.where((sid == sid[i]) | ~blocked, np.abs(np.arange(n) - i), 10 ** 6))
     peak = np.full(n, d_max)
     if oracle_holds is not None and len(oracle_holds) == n:
         peak = np.clip(np.asarray(oracle_holds), 2, d_max)
@@ -126,7 +170,8 @@ def plan_segment(hot, d_max, handle, oracle_holds=None, cuts=(), min_gap=24):
     seg = holds[a:b + 1].copy()
     # Calm stretches BETWEEN bursts (further than `handle` from any hot frame, at least min_gap long) are dropped from
     # the redraw (hold 0) and come straight from pass 1. Redrawing them only reinvented faces and backgrounds frame to
-    # frame. Each side of a gap is a segment edge like the outer ones: switched on a shot cut if one is in the handle.
+    # frame, and pass 2 runs without the audio, so a redrawn talking face loses its lip sync (the mouth freezes). Each
+    # side of a gap is a segment edge like the outer ones: switched on a shot cut if one is in the handle.
     gaps = []
     hidx = np.where(holds > 1)[0]                     # burst frames incl. their slowed shoulders
     dist_held = np.full(n, 10 ** 6)
@@ -167,6 +212,9 @@ class FastDeropeMotionGate:
             "d_max": ("INT", {"default": 4, "min": 2, "max": 8, "tooltip": "slow-down factor on hot frames"}),
             "handle_frames": ("INT", {"default": 12, "min": 2, "max": 48, "tooltip": "real-time context kept on each side of the burst"}),
         }, "optional": {
+            "min_calm_gap": ("INT", {"default": 12, "min": 4, "max": 96,
+                             "tooltip": "a calm stretch between two bursts (beyond both handles) at least this long stays pass 1 "
+                                        "instead of being redrawn. Keeps dialogue between moves lip-synced (pass 2 has no audio)"}),
             "static_threshold": ("FLOAT", {"default": 0.03, "min": 0.0, "max": 1.0, "step": 0.005,
                                  "tooltip": "regions still for a whole shot (grey change below this, per 16 px cell) keep "
                                             "pass 1's pixels (Freeze Mask + Segment Splice). 0 = redraw the whole frame"}),
@@ -189,13 +237,14 @@ class FastDeropeMotionGate:
                    "splice node then skips pass 2 entirely.")
 
     def gate(self, images, threshold, min_windows, margin, d_max, handle_frames, oracle_hold_map=None, freeze_frames=8,
-             static_threshold=0.03, static_images=None):
+             static_threshold=0.03, static_images=None, min_calm_gap=12):
         import json
         frames = images.detach().cpu().numpy()
         speed, cut = measure(frames)
         hot = hot_frames(speed, cut, threshold, min_windows, margin)
         oh = json.loads(oracle_hold_map)["holds"] if oracle_hold_map else None
-        plan = plan_segment(hot, d_max, handle_frames, oh, np.where(cut)[0])
+        plan = plan_segment(hot, d_max, handle_frames, oh, np.where(cut)[0], min_gap=min_calm_gap,
+                            still=still_frames(speed, cut))
         n = frames.shape[0]
         runs = [(int(a), int(a + ln - 1)) for a, ln in _runs(hot)]
         if plan is None:
