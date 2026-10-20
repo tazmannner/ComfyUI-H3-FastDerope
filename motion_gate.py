@@ -212,9 +212,6 @@ class FastDeropeMotionGate:
             "d_max": ("INT", {"default": 4, "min": 2, "max": 8, "tooltip": "slow-down factor on hot frames"}),
             "handle_frames": ("INT", {"default": 12, "min": 2, "max": 48, "tooltip": "real-time context kept on each side of the burst"}),
         }, "optional": {
-            "min_calm_gap": ("INT", {"default": 12, "min": 4, "max": 96,
-                             "tooltip": "a calm stretch between two bursts (beyond both handles) at least this long stays pass 1 "
-                                        "instead of being redrawn. Keeps dialogue between moves lip-synced (pass 2 has no audio)"}),
             "static_threshold": ("FLOAT", {"default": 0.03, "min": 0.0, "max": 1.0, "step": 0.005,
                                  "tooltip": "regions still for a whole shot (grey change below this, per 16 px cell) keep "
                                             "pass 1's pixels (Freeze Mask + Segment Splice). 0 = redraw the whole frame"}),
@@ -225,6 +222,10 @@ class FastDeropeMotionGate:
             "static_images": ("IMAGE", {"tooltip": "the full-quality decode of pass 1 (the splice baseline), used only for the "
                               "static-background map. A taeh3 decode shimmers on fine texture (foliage, grass), so those "
                               "regions would not count as still and get redrawn with fresh shimmer"}),
+            # new inputs go LAST: saved workflows fill widget values by position
+            "min_calm_gap": ("INT", {"default": 12, "min": 4, "max": 96,
+                             "tooltip": "a calm stretch between two bursts (beyond both handles) at least this long stays pass 1 "
+                                        "instead of being redrawn. Keeps dialogue between moves lip-synced (pass 2 has no audio)"}),
         }}
 
     RETURN_TYPES = ("IMAGE", "STRING", "STRING", "INT", "STRING")
