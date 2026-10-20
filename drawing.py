@@ -133,11 +133,35 @@ def plan_drawings(holds, hot, every, starts_for=None, key_tokens=1):
                 groups[k] = (d0, d1)
             slots.append((w0, w1, w0))
         f = h1
-    target = _legal_ceil(len(src))
-    last = src[-1]
-    src += [last] * (target - len(src))
-    groups[last] = (groups[last][0], len(src))
+    # Pad to a legal length by stepping back through the last frames (ping-pong), not by repeating the last one: a long
+    # run of one identical frame at the end makes H3 invent other content there (ghosts of an earlier shot), and the
+    # last real frame shares its latent token with that run. The padding is never shown (no world frame maps to it).
+    pad = _legal_ceil(len(src)) - len(src)
+    order = list(dict.fromkeys(reversed(src)))       # distinct world frames, latest first
+    bounce = order[1:] + order[::-1][1:] if len(order) > 1 else order
+    src += [bounce[i % len(bounce)] for i in range(pad)]
     return src, groups, slots
+
+
+def audio_holds(groups, start=0):
+    """Per WORLD frame of the whole clip: how many slowed frames it occupies in pass 2. A 2s/3s drawing's token is
+    shared by its 2-3 world frames, so its length is split between them in whole frames (5 over 2 -> 3, 2); calm gaps
+    left out of pass 2 are 0. Frames before the segment are 0, so H3 Audio Smear skips the clip's audio up to there."""
+    share, seen = {}, {}
+    for g in groups:
+        if g is not None:
+            share[tuple(g)] = share.get(tuple(g), 0) + 1
+    holds = [0] * int(start)
+    for g in groups:
+        if g is None:
+            holds.append(0)
+            continue
+        k = tuple(g)
+        i = seen.get(k, 0)
+        seen[k] = i + 1
+        q, r = divmod(g[1] - g[0], share[k])
+        holds.append(int(q + (1 if i < r else 0)))
+    return {"holds": holds, "world_len": len(holds)}
 
 
 def _sharpness(x):
@@ -165,8 +189,12 @@ class FastDeropeDrawingSmear:
                            "tooltip": "latent tokens per key-pose drawing (more = pass 2 holds the impact pose more firmly)"}),
         }}
 
-    RETURN_TYPES = ("IMAGE", "STRING", "INT", "STRING")
-    RETURN_NAMES = ("images", "drawing_map", "length", "report")
+    RETURN_TYPES = ("IMAGE", "STRING", "INT", "STRING", "STRING")
+    RETURN_NAMES = ("images", "drawing_map", "length", "report", "audio_hold_map")
+    OUTPUT_TOOLTIPS = (None, None, None, None,
+                       "for MAINodes H3 Audio Smear (pass-1 audio -> VAEEncodeAudio -> H3 V2V Init audio_latent, audio "
+                       "pinned): pass 2 then hears the real performance on its slowed clock instead of inventing speech "
+                       "and moving the mouth to it")
     FUNCTION = "smear"
     CATEGORY = "FastDerope"
     DESCRIPTION = ("Drawing De-rope, step 1. Inside the gated hot span keeps one frame per drawing slot (every 2 or 3 "
@@ -198,7 +226,8 @@ class FastDeropeDrawingSmear:
                   f"{len(src)} frames to redraw (a hold-4 de-rope of the hot span alone would be {4 * n_hot})"
                   + (f"; key poses at {keys_found}" if keys_found else ""))
         print("[FastDerope] " + report)
-        return (images[torch.tensor(src)], json.dumps(dm), len(src), report)
+        return (images[torch.tensor(src)], json.dumps(dm), len(src), report,
+                json.dumps(audio_holds(groups, hm.get("start", 0))))
 
 
 class FastDeropeDrawingRecover:

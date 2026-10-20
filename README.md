@@ -149,8 +149,9 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 | **H3 Window Attention (fast de-rope pass)** | MODEL patch for pass 2: temporal window attention (`window` latent frames each side, `anchor_stride`, `chunk`); calls under `min_frames` latent frames stay dense |
 | **Freeze Mask (lock splice handles to pass 1)** | per-frame regenerate/freeze MASK for H3 V2V Init (set `time_varying` on): locks the gate's outer handle frames and, with `segment_images`, the static background (`static_threshold` 0.03) |
 | **Segment Splice (skip pass 2 if calm)** | pastes the recovered burst into the full-quality pass 1; lazy input, so pass 2 only runs when the gate found something. `frozen` keeps the crossfade inside the locked frames; `restore_static` (0.03) pastes pass 1's pixels on static regions |
-| **Drawing Smear (de-rope only the drawings)** | replaces H3 Time Smear in workflow 03: one token-aligned static token per 2s drawing in the burst (`every`, `key_poses`, `key_tokens`), `drawing_map` |
+| **Drawing Smear (de-rope only the drawings)** | replaces H3 Time Smear in workflow 03: one token-aligned static token per 2s drawing in the burst (`every`, `key_poses`, `key_tokens`), `drawing_map`, and `audio_hold_map` for MAINodes H3 Audio Smear (pass 1's voice on pass 2's slowed clock, pinned in V2V Init, so pass 2 never invents speech) |
 | **Drawing Recover (hold drawings on 2s/3s)** | replaces H3 Exact Recover in workflow 03: holds each redrawn drawing (sharpest frame of its token) over its slot |
+| **Retime Prompt (shot timestamps for pass 2)** | in all examples: rewrites the prompt's `At 00:0X.XXX` shot timestamps onto pass 2's slowed clock (from the smear's map + `segment_start`) and drops shots that start after the segment. Without it, a later shot (its background, a character's tears) bleeds into the redrawn one |
 | **Load TAE as VAE (taeh3)** | loads a video TAE from `models/vae_approx` as a normal VAE for VAEEncode / VAEDecode |
 | **Color Anchor (experimental, not in the examples)** | MODEL patch for pass 2: keeps the slowed clip's coarse colours while sigma >= `sigma_low`. Cut colour drift ~20% on the sword fight, but on a huge, very fast motion (a fist filling the frame) it pulled the neighbouring pose back in as a faint see-through double |
 
@@ -211,6 +212,14 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
+- **v0.3.5**: multi-shot prompts and segments that end on a cut redraw cleanly. New **Retime Prompt** node (wired in
+  all examples): pass 2 runs on a slowed clock, so the prompt's shot timestamps landed in the wrong shot and a later
+  shot's background / tears bled into the redraw. Drawing Smear pads the clip to a legal length by stepping back through
+  the last frames instead of repeating the last one (a long frozen tail made H3 invent ghosts of an earlier shot), and
+  the Motion Gate locks the outer handle frames to pass 1 on a cut edge too. Pass 2 no longer invents speech: in
+  workflow 03 it hears pass 1's own voice, stretched onto its slowed clock (Drawing Smear `audio_hold_map` -> MAINodes
+  H3 Audio Smear -> VAEEncodeAudio -> H3 V2V Init `audio_latent`, pinned), so a redrawn face only moves its mouth
+  where the soundtrack speaks. Fight plans are unchanged.
 - **v0.3.4**: dialogue next to a burst keeps its lip sync. A burst in one shot no longer slows and redraws the end of
   a still shot before the cut (or the start of one after it), and calm stretches between bursts stay pass 1 from 12
   frames (was 24; new Motion Gate input `min_calm_gap`). Pass 2 has no audio, so a redrawn talking face froze its

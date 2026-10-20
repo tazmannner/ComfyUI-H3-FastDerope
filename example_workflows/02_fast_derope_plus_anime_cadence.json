@@ -1,6 +1,6 @@
 {
- "last_node_id": 43,
- "last_link_id": 67,
+ "last_node_id": 44,
+ "last_link_id": 70,
  "nodes": [
   {
    "id": 1,
@@ -705,7 +705,8 @@
      "type": "STRING",
      "links": [
       47,
-      66
+      66,
+      68
      ]
     },
     {
@@ -864,7 +865,7 @@
     {
      "name": "prompt",
      "type": "STRING",
-     "link": 28,
+     "link": 70,
      "widget": {
       "name": "prompt"
      }
@@ -1631,7 +1632,8 @@
      "name": "segment_start",
      "type": "INT",
      "links": [
-      61
+      61,
+      69
      ]
     },
     {
@@ -1973,6 +1975,63 @@
    "widgets_values": [
     "FAST DE-ROPE (H3 fast-motion smear fix)\n\nRequires matlowai/ComfyUI-MAINodes (Jerk Oracle, Time Smear, V2V Init, Inject Schedule, Exact Recover), taeh3.safetensors (madebyollin/taehv, encoder+decoder) in models/vae_approx, an H3 turbo LoRA for pass 2, and OpenCV for the Motion Gate. Use the fp16 video VAE for the final decode if you don't have the int8 one.\n1. PASS 1 is your normal render; its audio is the soundtrack.\n2. MOTION GATE measures pass 1 (optical flow, camera pans and shot cuts excluded) and keeps only sustained EXTREME motion. Calm clips (dialogue, gentle motion) skip pass 2 entirely: SEGMENT SPLICE never asks for it.\n3. The burst (+12-frame handles) is slowed down with MAINodes' Time Smear and redrawn in PASS 2 with H3 WINDOW ATTENTION: each frame attends exactly to nearby frames, anchors and all text/audio rows, ~40% cheaper than full attention on the 2-3x longer slowed clip, fast poses as crisp or crisper.\n4. taeh3 does the throwaway decode/encode; Exact Recover returns to real time; Segment Splice puts the burst back into the full-quality pass 1.\n5. NO GHOSTING: Freeze Mask locks the outer handle frames to pass 1 inside pass 2 (V2V Init, time_varying on), so the splice crossfade never blends two different takes; a handle containing a shot cut is switched exactly on the cut. It also locks the STATIC background (regions that don't move in pass 1): Segment Splice pastes pass 1's own pixels back there (restore_static), keeping full detail and stopping background shimmer.\n15 s at 1 MP: set d_max 3 (Motion Gate + Time Smear) if pass 2 runs out of memory.\n\nOPTIONAL: the last node is Anime Cadence from tazmannner/ComfyUI-H3-AnimeCadence (holds the result on 2s/3s); delete it if you don't use that pack."
    ]
+  },
+  {
+   "id": 44,
+   "type": "FastDeropeRetimePrompt",
+   "pos": [
+    2600,
+    652
+   ],
+   "size": [
+    340,
+    160
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "title": "RETIME PROMPT: shot timestamps on pass 2's slowed clock",
+   "inputs": [
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 28
+    },
+    {
+     "name": "seg_map",
+     "type": "STRING",
+     "link": 68
+    },
+    {
+     "name": "segment_start",
+     "type": "INT",
+     "link": 69
+    }
+   ],
+   "outputs": [
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "links": [
+      70
+     ]
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeRetimePrompt"
+   },
+   "widgets_values": [
+    "",
+    24.0
+   ]
   }
  ],
  "links": [
@@ -2196,8 +2255,8 @@
    28,
    38,
    0,
-   19,
-   2,
+   44,
+   0,
    "STRING"
   ],
   [
@@ -2511,6 +2570,30 @@
    37,
    2,
    "IMAGE"
+  ],
+  [
+   68,
+   16,
+   1,
+   44,
+   1,
+   "STRING"
+  ],
+  [
+   69,
+   34,
+   3,
+   44,
+   2,
+   "INT"
+  ],
+  [
+   70,
+   44,
+   0,
+   19,
+   2,
+   "STRING"
   ]
  ],
  "groups": [],

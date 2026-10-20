@@ -1,6 +1,6 @@
 {
- "last_node_id": 42,
- "last_link_id": 64,
+ "last_node_id": 45,
+ "last_link_id": 72,
  "nodes": [
   {
    "id": 1,
@@ -153,7 +153,8 @@
      "name": "VAE",
      "type": "VAE",
      "links": [
-      47
+      47,
+      71
      ]
     }
    ],
@@ -735,7 +736,7 @@
     {
      "name": "audio_latent",
      "type": "LATENT",
-     "link": null
+     "link": 72
     }
    ],
    "outputs": [
@@ -757,7 +758,7 @@
     0,
     false,
     true,
-    "custom (use audio_strength)",
+    "pin the original outright (0.0)",
     1.0,
     0,
     0
@@ -791,7 +792,7 @@
     {
      "name": "prompt",
      "type": "STRING",
-     "link": 26,
+     "link": 67,
      "widget": {
       "name": "prompt"
      }
@@ -1261,7 +1262,8 @@
      "name": "AUDIO",
      "type": "AUDIO",
      "links": [
-      49
+      49,
+      69
      ]
     }
    ],
@@ -1435,7 +1437,8 @@
      "name": "segment_start",
      "type": "INT",
      "links": [
-      56
+      56,
+      66
      ]
     },
     {
@@ -1592,7 +1595,8 @@
      "type": "STRING",
      "links": [
       45,
-      63
+      63,
+      65
      ]
     },
     {
@@ -1606,6 +1610,13 @@
      "name": "report",
      "type": "STRING",
      "links": []
+    },
+    {
+     "name": "audio_hold_map",
+     "type": "STRING",
+     "links": [
+      68
+     ]
     }
    ],
    "properties": {
@@ -1863,6 +1874,150 @@
    "widgets_values": [
     "DRAWING DE-ROPE (2s)\n\nInside the gated burst, anime only needs a new drawing every 2 frames, so only those drawings are slowed down and redrawn: each gets one static latent token, aligned to H3's token grid (key poses such as impacts get two, so pass 2 commits to them; shot cuts always start a new drawing). Drawing Recover holds each redrawn drawing over its 2-frame slot: the burst comes back crisp and already on 2s. Pass 2 was 8-26% cheaper than the per-frame fast de-rope in our tests (more on long bursts), same crispness, impacts on the same frames."
    ]
+  },
+  {
+   "id": 43,
+   "type": "FastDeropeRetimePrompt",
+   "pos": [
+    2600,
+    652
+   ],
+   "size": [
+    340,
+    160
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "title": "RETIME PROMPT: shot timestamps on pass 2's slowed clock",
+   "inputs": [
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 26
+    },
+    {
+     "name": "seg_map",
+     "type": "STRING",
+     "link": 65
+    },
+    {
+     "name": "segment_start",
+     "type": "INT",
+     "link": 66
+    }
+   ],
+   "outputs": [
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "links": [
+      67
+     ]
+    },
+    {
+     "name": "report",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FastDeropeRetimePrompt"
+   },
+   "widgets_values": [
+    "",
+    24.0
+   ]
+  },
+  {
+   "id": 44,
+   "type": "H3AudioSmear",
+   "pos": [
+    3000,
+    1018
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "title": "AUDIO SMEAR: pass 1's voice on pass 2's slowed clock (no invented speech)",
+   "inputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 69
+    },
+    {
+     "name": "hold_map",
+     "type": "STRING",
+     "widget": {
+      "name": "hold_map"
+     },
+     "link": 68
+    }
+   ],
+   "outputs": [
+    {
+     "name": "AUDIO",
+     "type": "AUDIO",
+     "links": [
+      70
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3AudioSmear"
+   },
+   "widgets_values": [
+    "",
+    24
+   ]
+  },
+  {
+   "id": 45,
+   "type": "VAEEncodeAudio",
+   "pos": [
+    3000,
+    1178
+   ],
+   "size": [
+    240,
+    46
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 70
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 71
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      72
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncodeAudio"
+   },
+   "widgets_values": []
   }
  ],
  "links": [
@@ -2070,8 +2225,8 @@
    26,
    36,
    0,
-   18,
-   2,
+   43,
+   0,
    "STRING"
   ],
   [
@@ -2377,6 +2532,70 @@
    35,
    2,
    "IMAGE"
+  ],
+  [
+   65,
+   34,
+   1,
+   43,
+   1,
+   "STRING"
+  ],
+  [
+   66,
+   31,
+   3,
+   43,
+   2,
+   "INT"
+  ],
+  [
+   67,
+   43,
+   0,
+   18,
+   2,
+   "STRING"
+  ],
+  [
+   68,
+   34,
+   4,
+   44,
+   1,
+   "STRING"
+  ],
+  [
+   69,
+   28,
+   0,
+   44,
+   0,
+   "AUDIO"
+  ],
+  [
+   70,
+   44,
+   0,
+   45,
+   0,
+   "AUDIO"
+  ],
+  [
+   71,
+   5,
+   0,
+   45,
+   1,
+   "VAE"
+  ],
+  [
+   72,
+   45,
+   0,
+   17,
+   3,
+   "LATENT"
   ]
  ],
  "groups": [],

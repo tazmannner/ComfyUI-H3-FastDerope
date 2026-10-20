@@ -257,8 +257,10 @@ class FastDeropeMotionGate:
         h_in, h_out = held[0], len(holds) - 1 - held[-1]
         # Outer handle frames to lock to pass 1 inside pass 2 (wire FastDerope Freeze Mask -> H3 V2V Init): the splice
         # crossfade then blends pass 1 with (nearly) itself, never with a different take. Keep >= 4 live handle frames.
+        # The out-edge is locked even when it ends on a shot cut: the last frames of the redrawn clip (plus the padding to
+        # a legal length) otherwise degenerate into crack-like lines, and hires spreads them over that latent token.
         f_in = 0 if hard_in else max(0, min(freeze_frames, h_in - 4))
-        f_out = 0 if hard_out else max(0, min(freeze_frames, h_out - 4))
+        f_out = max(0, min(freeze_frames, h_out - 4))
         freeze = [1 if (i < f_in or i >= len(holds) - f_out) else 0 for i in range(len(holds))]
         for gp in gaps:                                   # lock the frames next to each calm gap the same way
             g0, g1, hl, hr = gp
@@ -279,7 +281,8 @@ class FastDeropeMotionGate:
                + (f"; calm gaps kept from pass 1: {[(a + g[0], a + g[1]) for g in gaps]}" if gaps else ""))
         print("[FastDerope] " + rep)
         # "hot" marks the sustained-fast frames themselves (not shoulders/handles): Drawing Smear redraws only those as drawings
-        seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]], "freeze": freeze}
+        seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]], "freeze": freeze,
+                   "start": int(a)}
         if static_threshold > 0:
             src = static_images if static_images is not None and static_images.shape[0] == images.shape[0] else images
             smap = shot_static_map(src[a:b + 1].detach().cpu(), static_threshold,
