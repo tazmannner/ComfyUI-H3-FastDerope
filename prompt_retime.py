@@ -22,41 +22,64 @@ def _dilated_starts(m):
     return out
 
 
+SHOT = re.compile(r"^\s*(\[Shot \d+\]\s*)?(At \d+:\d{2}\.\d{3})?")
+
+
+def _shot_start(line):
+    """a line opens a shot when it starts with "[Shot N]" and/or an "At mm:ss.mmm" timestamp"""
+    m = SHOT.match(line)
+    return bool(m and (m.group(1) or m.group(2)))
+
+
+def _secs(t):
+    return int(t.group(1)) * 60 + int(t.group(2)) + int(t.group(3)) / 1000
+
+
 def retime(prompt, seg_map, segment_start, fps=24.0):
+    """Shots are the lines that open with "[Shot N]" or "At mm:ss.mmm"; each runs until the next shot line or a blank
+    line. Everything else (definitions, summary, setting, style, untimed paragraphs) is kept as it is. Shots that start
+    after the segment or end before it are dropped; every timestamp left is moved onto pass 2's slowed clock. A prompt
+    without timestamps comes back unchanged."""
     m = json.loads(seg_map)
     starts = _dilated_starts(m)
     n = len(starts)
     if n == 0:
         return prompt, "no segment"
+    if not TS.search(prompt):
+        return prompt, "no timestamps"
     a, b = segment_start, segment_start + n - 1
     cut = prompt.find("overall_soundscape:")
     desc, rest = (prompt, "") if cut < 0 else (prompt[:cut], prompt[cut:])
-    paras = [p for p in re.split(r"\n\s*\n", desc.strip()) if p.strip()]
-    times = []
-    for i, p in enumerate(paras):
-        t = TS.search(p)
-        times.append(int(t.group(1)) * 60 + int(t.group(2)) + int(t.group(3)) / 1000 if t else (0.0 if i == 0 else None))
-    for i in range(1, len(times)):                      # a paragraph without a timestamp continues the one before it
-        if times[i] is None:
-            times[i] = times[i - 1]
-    frames = [int(round(t * fps)) for t in times]
-    keep, log = [], []
-    last_before = max([i for i in range(1, len(paras)) if frames[i] <= a] or [0])
-    for i, p in enumerate(paras):
-        if i > 0 and frames[i] > b:
-            log.append(f"drop para {i + 1} (starts f{frames[i]} after the segment f{a}-f{b})")
-            continue
-        if 0 < i < last_before:
-            log.append(f"drop para {i + 1} (ends before the segment)")
-            continue
-        if i > 0 and TS.search(p):
-            d = starts[max(0, frames[i] - a)] / fps
-            new = f"At {int(d // 60):02d}:{int(d % 60):02d}.{int(round((d % 1) * 1000)) % 1000:03d}"
-            log.append(f"para {i + 1}: f{frames[i]} -> {new[3:]}")
-            p = TS.sub(new, p, count=1)
-        keep.append(p)
-    out = "\n\n".join(keep) + ("\n\n" + rest if rest else "")
-    return out, "; ".join(log) or "no timestamps"
+    lines = desc.split("\n")
+    shots, cur = [], None                    # shots: [first line, last line, start frame]
+    for i, line in enumerate(lines):
+        if _shot_start(line):
+            t = TS.search(line)
+            f = int(round(_secs(t) * fps)) if t else (shots[-1][2] if shots else 0)
+            cur = [i, i, f]
+            shots.append(cur)
+        elif cur is not None and line.strip():
+            cur[1] = i                       # the shot continues on the next line of its paragraph
+        else:
+            cur = None                       # a blank line ends the shot; what follows is kept
+    log, drop = [], set()
+    last_before = max([k for k, s in enumerate(shots) if s[2] <= a] or [0])
+    for k, (l0, l1, f) in enumerate(shots):
+        why = (f"starts f{f} after the segment f{a}-f{b}" if f > b and k > 0
+               else "ends before the segment" if k < last_before else None)
+        if why:
+            log.append(f"drop shot {k + 1} ({why})")
+            drop.update(range(l0, l1 + 1))
+
+    def move(t):
+        f = int(round(_secs(t) * fps))
+        d = starts[min(n - 1, max(0, f - a))] / fps
+        new = f"At {int(d // 60):02d}:{int(d % 60):02d}.{int(round((d % 1) * 1000)) % 1000:03d}"
+        log.append(f"f{f} -> {new[3:]}")
+        return new
+    kept = [TS.sub(move, line) for i, line in enumerate(lines) if i not in drop]
+    out = re.sub(r"\n{3,}", "\n\n", "\n".join(kept)).rstrip() + ("\n\n" + rest if rest else "")
+    return out, "; ".join(log) or "timestamps kept"
 
 
 class FastDeropeRetimePrompt:
