@@ -151,7 +151,7 @@ Edgerunners, Re:Zero, Teen Titans, Golden Boy and plain H3 clips.
 | **Segment Splice (skip pass 2 if calm)** | pastes the recovered burst into the full-quality pass 1; lazy input, so pass 2 only runs when the gate found something. `frozen` keeps the crossfade inside the locked frames; `restore_static` (0.03) pastes pass 1's pixels on static regions |
 | **Drawing Smear (de-rope only the drawings)** | replaces H3 Time Smear in workflow 03: one token-aligned static token per 2s drawing in the burst (`every`, `key_poses`, `key_tokens`), `drawing_map`, and `audio_hold_map` for MAINodes H3 Audio Smear (pass 1's voice on pass 2's slowed clock, pinned in V2V Init, so pass 2 never invents speech) |
 | **Drawing Recover (hold drawings on 2s/3s)** | replaces H3 Exact Recover in workflow 03: holds each redrawn drawing (sharpest frame of its token) over its slot |
-| **Retime Prompt (shot timestamps for pass 2)** | in all examples: rewrites the prompt's `At 00:0X.XXX` shot timestamps onto pass 2's slowed clock (from the smear's map + `segment_start`) and drops shots that start after the segment or end before it. A shot is a line that opens with `[Shot N]` or a timestamp (it runs to the next shot line or a blank line); everything else in the prompt is kept, and a prompt without timestamps passes through unchanged. Without it, a later shot (its background, a character's tears) bleeds into the redrawn one |
+| **Retime Prompt (shot timestamps for pass 2)** | in all examples: rewrites the prompt's `At 00:0X.XXX` shot timestamps onto pass 2's slowed clock (from the smear's map + `segment_start`) and drops shots that start after the segment or end before it. A shot is a line that opens with `[Shot N]` or a timestamp (it runs to the next shot line or a blank line). Beats timed in seconds (`OPENING – 0-1.5 SECONDS:`, `1.5-3.5s`, `ACTION (2 s):`, `0:01.5-0:03.5:`) are retimed too: a beat runs across paragraphs to the next beat, shot line or header (`CAMERA:`, `overall_soundscape:`), keeps its stated end, and a beat that straddles the segment edge is clipped to it. Everything else in the prompt is kept, and a prompt without timestamps passes through unchanged. `report` lists each shot and beat (old → new time, kept or dropped) and warns about time-like text it could not read. Without it, a later shot (its background, a character's tears) bleeds into the redrawn one |
 | **Load TAE as VAE (taeh3)** | loads a video TAE from `models/vae_approx` as a normal VAE for VAEEncode / VAEDecode |
 | **Color Anchor (experimental, not in the examples)** | MODEL patch for pass 2: keeps the slowed clip's coarse colours while sigma >= `sigma_low`. Cut colour drift ~20% on the sword fight, but on a huge, very fast motion (a fist filling the frame) it pulled the neighbouring pose back in as a faint see-through double |
 
@@ -212,6 +212,12 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
+- **v0.3.7**: Retime Prompt reads beats timed in seconds, not only `At mm:ss.mmm` shots. Ranges and single times in
+  seconds or m:ss (`OPENING – 0-1.5 SECONDS:`, `1.5-3.5s`, `ACTION (2 s):`, `0:01.5-0:03.5:`; hyphen, en or em dash, any
+  case, label optional) are moved onto pass 2's clock; a beat runs across paragraphs until the next beat, shot line or
+  header, its stated end decides whether it is kept, and a beat that straddles the segment edge is kept and clipped. The
+  `report` output lists every shot and beat with its old and new time, and warns about time-like text it left alone.
+  Prompts with `At` timestamps only come out exactly as in v0.3.6. Thanks to The Shadow for the request.
 - **v0.3.6**: Retime Prompt no longer drops your description. It treated every paragraph without a timestamp as part of
   the shot before it, so a prompt with no timestamps lost everything but its first and last paragraphs, and a sectioned
   prompt (`subject_definitions:` / `summary:` / `detailed_description:`) lost its summary; only the first timestamp of
