@@ -212,6 +212,7 @@ git clone https://github.com/tazmannner/ComfyUI-H3-FastDerope
 
 ## Changelog
 
+- **v0.3.8**: no more held or blended frames at shot cuts inside a redrawn burst: Drawing Smear now takes the Motion Gate's cuts (its own detector missed some), and a single stray frame before a cut holds the previous drawing. New Segment Splice option `match_exposure` (on in the examples): the redraw often comes back a few percent darker than pass 1; each shot gets one gain per colour channel so it matches again.
 - **v0.3.7**: Retime Prompt reads beats timed in seconds, not only `At mm:ss.mmm` shots. Ranges and single times in
   seconds or m:ss (`OPENING – 0-1.5 SECONDS:`, `1.5-3.5s`, `ACTION (2 s):`, `0:01.5-0:03.5:`; hyphen, en or em dash, any
   case, label optional) are moved onto pass 2's clock; a beat runs across paragraphs until the next beat, shot line or

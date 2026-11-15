@@ -1552,7 +1552,8 @@
    "widgets_values": [
     6,
     true,
-    0.03
+    0.03,
+    true
    ]
   },
   {
