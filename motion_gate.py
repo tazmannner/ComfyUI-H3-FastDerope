@@ -282,8 +282,9 @@ class FastDeropeMotionGate:
                + (f"; calm gaps kept from pass 1: {[(a + g[0], a + g[1]) for g in gaps]}" if gaps else ""))
         print("[FastDerope] " + rep)
         # "hot" marks the sustained-fast frames themselves (not shoulders/handles): Drawing Smear redraws only those as drawings
+        # "cuts": the shot cuts inside the segment (segment frame indices), so Drawing Smear never lets a drawing straddle one
         seg_map = {"holds": holds, "world_len": len(holds), "hot": [int(x) for x in hot[a:b + 1]], "freeze": freeze,
-                   "start": int(a)}
+                   "start": int(a), "cuts": [int(c - a) for c in np.where(cut)[0] if a < c <= b]}
         if static_threshold > 0:
             src = static_images if static_images is not None and static_images.shape[0] == images.shape[0] else images
             smap = shot_static_map(src[a:b + 1].detach().cpu(), static_threshold,
@@ -309,19 +310,25 @@ class FastDeropeSegmentSplice:
                                "tooltip": "same threshold as Freeze Mask static_threshold: pastes pass 1's own pixels back on "
                                           "regions that don't move (full detail, no background boil). 0 = off"}),
             "segment": ("IMAGE", {"lazy": True, "tooltip": "H3 Exact Recover output of the de-roped segment"}),
+            "match_exposure": ("BOOLEAN", {"default": False,
+                               "tooltip": "the redraw often comes back a few percent darker or brighter than pass 1. On: each "
+                                          "shot of the redraw gets one gain per colour channel (the median over its frames "
+                                          "of pass 1's mean / the redraw's mean), so its exposure matches pass 1 again"}),
         }}
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "splice"
     CATEGORY = "FastDerope"
 
-    def check_lazy_status(self, baseline, splice_map, feather_frames, segment=None, frozen=True, restore_static=0.0):
+    def check_lazy_status(self, baseline, splice_map, feather_frames, segment=None, frozen=True, restore_static=0.0,
+                          match_exposure=False):
         import json
         if json.loads(splice_map).get("active") and segment is None:
             return ["segment"]
         return []
 
-    def splice(self, baseline, splice_map, feather_frames, segment=None, frozen=True, restore_static=0.0):
+    def splice(self, baseline, splice_map, feather_frames, segment=None, frozen=True, restore_static=0.0,
+               match_exposure=False):
         import json
         import torch
         sp = json.loads(splice_map)
@@ -335,6 +342,19 @@ class FastDeropeSegmentSplice:
         if seg.shape[1:] != out.shape[1:]:
             seg = torch.nn.functional.interpolate(seg.permute(0, 3, 1, 2), size=out.shape[1:3], mode="bilinear",
                                                   align_corners=False).permute(0, 2, 3, 1)
+        if match_exposure:   # one gain per shot and channel: constant inside a shot, so nothing flickers
+            pieces = [(p[0], p[1]) for p in sp["static"]["pieces"]] if sp.get("static") else [(0, n)]
+            seg = seg.clone()   # never write into the upstream node's cached frames
+            gains = []
+            for s0, e0 in pieces:
+                e0 = min(e0, n)
+                if e0 <= s0:
+                    continue
+                ratio = out[a + s0:a + e0].mean(dim=(1, 2)) / seg[s0:e0].mean(dim=(1, 2)).clamp_min(1e-4)   # [frames, C]
+                gain = ratio.median(dim=0).values.clamp(0.85, 1.2)
+                seg[s0:e0] = (seg[s0:e0] * gain).clamp_(0.0, 1.0)
+                gains.append(round(float(gain.mean()), 3))
+            print(f"[FastDerope] SegmentSplice match_exposure: gain per shot {gains}")
         fi = min(feather_frames, sp.get("handle_in", feather_frames))
         fo = min(feather_frames, sp.get("handle_out", feather_frames))
         if sp.get("hard_in"):

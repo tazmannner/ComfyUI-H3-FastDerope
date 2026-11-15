@@ -88,12 +88,17 @@ def key_slots(h0, h1, every, e, m, cuts=(), min_e=0.35):
             keys.append(k)
     bounds = sorted(set([h0] + keys + [c for c in cuts if h0 < c < h1])) + [h1]
     starts = []
+    cutset = set(cuts)
     for a, b in zip(bounds[:-1], bounds[1:]):
+        # one lone frame left between the last key pose and a shot cut: no drawing of its own, the drawing before it
+        # holds one frame longer. Its token would sit alone against the next shot and pass 2 blends the two shots into it
+        if b - a == 1 and b in cutset and a not in cutset and starts:
+            continue
         p = a
         for ln in _split_gap(b - a, every):
             starts.append(p)
             p += ln
-    return starts, sorted(keys)
+    return starts, sorted(k for k in keys if k in starts)
 
 
 def plan_drawings(holds, hot, every, starts_for=None, key_tokens=1):
@@ -213,6 +218,9 @@ class FastDeropeDrawingSmear:
         starts_for = None
         if key_poses and every > 1:
             e, m, cuts = key_scores(images)
+            # the gate's cuts too: its detector (histogram + correlation) finds cuts between shots with a similar
+            # palette that the histogram test above misses, and a drawing held across a cut shows the wrong shot
+            cuts = sorted(set(cuts) | {int(c) for c in hm.get("cuts") or [] if 0 < int(c) < n})
 
             def starts_for(h0, h1):
                 st, ks = key_slots(h0, h1, every, e, m, cuts)
